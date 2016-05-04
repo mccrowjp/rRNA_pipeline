@@ -1,5 +1,7 @@
 # rRNA_pipeline
-### Pipeline for read filtering, swarm OTU clustering, and taxonomic classification for ssu-rRNA
+#### Pipeline for read filtering, swarm OTU clustering, and taxonomic classification for ssu-rRNA
+
+* Actively under development, not all features are functional yet.
 
 Usage
 -----
@@ -35,17 +37,21 @@ Usage: rRNA_pipeline.py (options)
 
 The rRNA pipeline will skip previous steps if stopped and rerun, unless -W is specified.  To rerun a step, delete the output files created during that step.
 
-If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.  Basic operation for 16S:
+If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.  
+
+Basic operation for 16S:
 ```bash
 rRNA_pipeline.py -d 16S
 ```
 
-To replace FASTQ filenames with sample names in all output, use -n to specify tab-delimited file (sample_name, FASTQ base name).  FASTQ basenames can be followed by any of [_R1, _R2, .filtered, .fastq, .fq].  Use the following for 18S V4, with sample names, run on 4 CPUs:
+To replace FASTQ filenames with sample names in all output, use -n to specify tab-delimited file (sample_name, FASTQ base name).  FASTQ base names may be followed by any of [_R1, _R2, .filtered, .fastq, .fq] in the full FASTQ file name.  
+
+Use the following for 18S V4, with sample names, run on 4 CPUs:
 ```bash
 rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4
 ```
 
-Output files, created in the following order:
+*Output files, created in the following order:*
 
 | File | Description |
 |------|-------------|
@@ -71,7 +77,7 @@ Output files, created in the following order:
 | rrna.swarm.purity | swarm purity table |
 | rrna.swarm.purity.pdf | plot of swarm purity |
 
-(multiple paired FASTQ base filename 'fqbase1', and single output base filename 'rrna')
+(multiple paired FASTQ base filename *'fqbase1'*, and single output base filename *'rrna'*)
 
 Installation
 ------------
