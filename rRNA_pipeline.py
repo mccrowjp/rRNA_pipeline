@@ -171,75 +171,220 @@ def run_classify(output_base_file, database_name):
     swarm_fa = output_base_file + ".swarm.fa"
     swarm_counts = output_base_file + ".swarm.counts"
     ggsearch_file = output_base_file + ".swarm.ggsearch"
-
     outfile = output_base_file + ".swarm.tax"
-    if database_name == '16S':
-        outfile = output_base_file + ".swarm.tmp.tax"
     
     cmd_params = " ".join(["-t", str(cpus), "-f", swarm_fa, "-g", ggsearch_file, "-d", database_file, "-c", swarm_counts, "-o", outfile])
     
     run_command('classifiy', outfile, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
 
-def remove_plastid_seqs(swarm_fa, swarm_tmp, swarm_16S_tax, swarm_plastid_fa):
+def remove_plastid_seqs(output_base_file):
     dict_plastid = {}
+    swarm_tax = output_base_file + ".swarm.tax"
+
+    derep_fa = output_base_file + ".derep.fa"
+    derep_counts = output_base_file + ".derep.counts"
+    swarm_table = output_base_file + ".swarm"
+    swarm_fa = output_base_file + ".swarm.fa"
+    swarm_counts = output_base_file + ".swarm.counts"
     
+    derep_plastid_fa = output_base_file + ".plastid.derep.fa"
+    derep_plastid_counts = output_base_file + ".plastid.derep.counts"
+    swarm_plastid_table = output_base_file + ".plastid.swarm"
+    swarm_plastid_fa = output_base_file + ".plastid.swarm.fa"
+    swarm_plastid_counts = output_base_file + ".plastid.swarm.counts"
+
+    tmp_derep_16S_fa = derep_fa + ".tmp"
+    tmp_derep_16S_counts = derep_counts + ".tmp"
+    tmp_swarm_16S_table = swarm_table + ".tmp"
+    tmp_swarm_16S_fa = swarm_fa + ".tmp"
+    tmp_swarm_16S_counts = swarm_counts + ".tmp"
+    tmp_swarm_16S_tax = swarm_tax + ".tmp"
+
     if verbose:
         print >>sys.stderr, "Filtering chloroplast sequences"
-    
-    in_handle1 = hopen_or_else(swarm_tmp)
-    out_handle1 = hopen_write_or_else(swarm_16S_tax)
-    
+
+    # split 16S/Plastid swarm taxonomy table
+    in_handle_tax = hopen_or_else(swarm_tax)
+    out_handle_16S_tax = hopen_write_or_else(tmp_swarm_16S_tax)
+
     firstline = 1
     while 1:
-        line = in_handle1.readline()
+        line = in_handle_tax.readline()
         if not line:
             break
         line = line.rstrip()
         cols = line.split('\t')
 
-        m = re.match('Bacteria;Cyanobacteria;Chloroplast', cols[2])
-        if firstline or not m:
-            print >>out_handle1, line
+        if firstline:
+            print >>out_handle_16S_tax, line
         else:
-            dict_plastid[cols[0]] = 1
+            m = re.match('Bacteria;Cyanobacteria;Chloroplast', cols[2])
+            if m:
+                dict_plastid[cols[0]] = 1
+            else:
+                print >>out_handle_16S_tax, line
+
         firstline = 0
 
-    in_handle1.close()
-    out_handle1.close()
+    in_handle_tax.close()
+    out_handle_16S_tax.close()
 
-    in_handle2 = hopen_or_else(swarm_fa)
-    out_handle2 = hopen_write_or_else(swarm_plastid_fa)
+    # split 16S/Plastid swarm file
+    in_handle_table = hopen_or_else(swarm_table)
+    out_handle_16S_table = hopen_write_or_else(tmp_swarm_16S_table)
+    out_handle_plastid_table = hopen_write_or_else(swarm_plastid_table)
+    
+    while 1:
+        line = in_handle_table.readline()
+        if not line:
+            break
+        line = line.rstrip()
+        id_list = re.split('\s', line)
+        swarm_id = id_list[0]
+        
+        if swarm_id in dict_plastid:
+            print >>out_handle_plastid_table, line
+            for id in id_list:
+                dict_plastid[id] = 1
+        else:
+            print >>out_handle_16S_table, line
 
+    in_handle_table.close()
+    out_handle_16S_table.close()
+    out_handle_plastid_table.close()
+
+    # split 16S/Plastid derep FASTA
+    in_handle_derep_fa = hopen_or_else(derep_fa)
+    out_handle_16S_derep_fa = hopen_write_or_else(tmp_derep_16S_fa)
+    out_handle_plastid_derep_fa = hopen_write_or_else(derep_plastid_fa)
+    
     id = ""
     while 1:
-        line = in_handle2.readline()
+        line = in_handle_derep_fa.readline()
         if not line:
             break
         line = line.rstrip()
         
         if line.startswith(">"):
-            id = re.split('\s', line[1:])
+            id = re.split('\s', line[1:])[0]
+        
+        if id:
+            if id in dict_plastid:
+                print >>out_handle_plastid_derep_fa, line
+            else:
+                print >>out_handle_16S_derep_fa, line
 
-        if id and id in dict_plastid:
-            print >>out_handle2, line
+    in_handle_derep_fa.close()
+    out_handle_16S_derep_fa.close()
+    out_handle_plastid_derep_fa.close()
+    
+    # split 16S/Plastid derep counts table
+    in_handle_derep_counts = hopen_or_else(derep_counts)
+    out_handle_16S_derep_counts = hopen_write_or_else(tmp_derep_16S_counts)
+    out_handle_plastid_derep_counts = hopen_write_or_else(derep_plastid_counts)
+    
+    firstline = 1
+    while 1:
+        line = in_handle_derep_counts.readline()
+        if not line:
+            break
+        line = line.rstrip()
+        cols = line.split('\t')
+        
+        if firstline:
+            print >>out_handle_16S_derep_counts, line
+            print >>out_handle_plastid_derep_counts, line
+        else:
+            if cols[0] in dict_plastid:
+                print >>out_handle_plastid_derep_counts, line
+            else:
+                print >>out_handle_16S_derep_counts, line
 
-    in_handle2.close()
-    out_handle2.close()
+        firstline = 0
+
+    in_handle_derep_counts.close()
+    out_handle_16S_derep_counts.close()
+    out_handle_plastid_derep_counts.close()
+
+    # split 16S/Plastid swarm FASTA
+    in_handle_fa = hopen_or_else(swarm_fa)
+    out_handle_16S_fa = hopen_write_or_else(tmp_swarm_16S_fa)
+    out_handle_plastid_fa = hopen_write_or_else(swarm_plastid_fa)
+
+    id = ""
+    while 1:
+        line = in_handle_fa.readline()
+        if not line:
+            break
+        line = line.rstrip()
+        
+        if line.startswith(">"):
+            id = re.split('\s', line[1:])[0]
+
+        if id:
+            if id in dict_plastid:
+                print >>out_handle_plastid_fa, line
+            else:
+                print >>out_handle_16S_fa, line
+
+    in_handle_fa.close()
+    out_handle_16S_fa.close()
+    out_handle_plastid_fa.close()
+
+    # split 16S/Plastid swarm counts table
+    in_handle_counts = hopen_or_else(swarm_counts)
+    out_handle_16S_counts = hopen_write_or_else(tmp_swarm_16S_counts)
+    out_handle_plastid_counts = hopen_write_or_else(swarm_plastid_counts)
+
+    firstline = 1
+    while 1:
+        line = in_handle_counts.readline()
+        if not line:
+            break
+        line = line.rstrip()
+        cols = line.split('\t')
+
+        if firstline:
+            print >>out_handle_16S_counts, line
+            print >>out_handle_plastid_counts, line
+        else:
+            if cols[0] in dict_plastid:
+                print >>out_handle_plastid_counts, line
+            else:
+                print >>out_handle_16S_counts, line
+
+        firstline = 0
+    
+    in_handle_counts.close()
+    out_handle_16S_counts.close()
+    out_handle_plastid_counts.close()
+
+    # replace original swarm files with 16S only
+    if os.path.exists(tmp_derep_16S_fa) and os.path.exists(tmp_derep_16S_counts) and os.path.exists(tmp_swarm_16S_table) and os.path.exists(tmp_swarm_16S_tax) and os.path.exists(tmp_swarm_16S_fa) and os.path.exists(tmp_swarm_16S_counts):
+        os.system("mv " + tmp_derep_16S_fa + " " + derep_fa)
+        os.system("mv " + tmp_derep_16S_counts + " " + derep_counts)
+        os.system("mv " + tmp_swarm_16S_table + " " + swarm_table)
+        os.system("mv " + tmp_swarm_16S_tax + " " + swarm_tax)
+        os.system("mv " + tmp_swarm_16S_fa + " " + swarm_fa)
+        os.system("mv " + tmp_swarm_16S_counts + " " + swarm_counts)
+    else:
+        print >>sys.stderr, "Not all tmp_ files found"
+        sys.exit(2)
 
 def run_classify_chloro(output_base_file, database_file):
-    swarm_fa = output_base_file + ".swarm.fa"
-    swarm_tmp = output_base_file + ".swarm.tmp.tax"
-    swarm_16S_tax = output_base_file + ".swarm.tax"
-    swarm_plastid_fa = output_base_file + ".plastid.swarm.fa"
-    remove_plastid_seqs(swarm_fa, swarm_tmp, swarm_16S_tax, swarm_plastid_fa)
-
     swarm_counts = output_base_file + ".swarm.counts"
+    swarm_plastid_fa = output_base_file + ".plastid.swarm.fa"
     ggsearch_file = output_base_file + ".plastid.swarm.ggsearch"
-    outfile = output_base_file + ".plastid.swarm.tax"
-
-    cmd_params = " ".join(["-t", str(cpus), "-f", swarm_plastid_fa, "-g", ggsearch_file, "-d", database_file, "-c", swarm_counts, "-o", outfile])
+    swarm_plastid_tax = output_base_file + ".plastid.swarm.tax"
     
-    run_command('classifiy_plastid', outfile, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
+    if overwrite or not os.path.exists(swarm_plastid_fa):
+        remove_plastid_seqs(output_base_file)
+    else:
+        print sys.stderr, "[rRNA_pipeline] skipping classify_plastid"
+
+    cmd_params = " ".join(["-t", str(cpus), "-f", swarm_plastid_fa, "-g", ggsearch_file, "-d", database_file, "-c", swarm_counts, "-o", swarm_plastid_tax])
+    
+    run_command('classifiy_plastid', swarm_plastid_tax, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
 
 def run_purity(output_base_file, database_file):
     derep_fa = output_base_file + ".derep.fa"
@@ -398,9 +543,9 @@ def main(argv):
     # 16S contains plastid sequences that need to be classified seperately against PhytoRef
     if database_name == '16S':
         run_classify_chloro(output_base_file, dict_database_path['chloro'])
+        run_plots(output_base_file + ".plastid", 'chloro')
         run_purity(output_base_file + ".plastid", dict_database_path['chloro'])
-        run_plots(output_base_file + ".plastid")
-    
+
     run_plots(output_base_file, database_name)
     run_purity(output_base_file, database_file)
 
