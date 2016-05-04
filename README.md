@@ -1,5 +1,5 @@
 # rRNA_pipeline
-#### Pipeline for read filtering, swarm OTU clustering, and taxonomic classification for ssu-rRNA
+#### Pipeline for read filtering, swarm OTU clustering, and taxonomic classification of ssu-rRNA
 
 * Actively under development, not all features are functional yet.
 
@@ -59,7 +59,7 @@ rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4
 | fqbase1.discarded.fastq | Pear unmerged reads
 | fqbase1.unassembled.forward.fastq | Pear unmerged reads R1 
 | fqbase1.unassembled.reverse.fastq | Pear unmerged reads R2
-| fqbase1.uchime | usearch -uchime_ref list of chimeric reads
+| fqbase1.uchime | Usearch -uchime_ref list of chimeric reads
 | fqbase1.filtered.fa | final set of filtered reads
 | ... | |
 | | |
@@ -78,6 +78,8 @@ rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4
 | rrna.swarm.purity.pdf | plot of swarm purity |
 
 (multiple paired FASTQ base filename *'fqbase1'*, and single output base filename *'rrna'*)
+
+In the case of 16S, files are split into two groups: those that are classified as plastid, and those that are not (determined by *'rrna.swarm.ggsearch'*).  The non-plastid rows/sequences are written over the base *'rrna'* files, and the plastid 16S rows/sequences are written to a separate set of files, *'rrna.plastid'*, and swarm OTUs are re-classified by the phytoRef database.
 
 Installation
 ------------
