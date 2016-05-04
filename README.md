@@ -1,7 +1,9 @@
 # rRNA_pipeline
 #### Pipeline for read filtering, swarm OTU clustering, and taxonomic classification of ssu-rRNA
 
-* Actively under development, not all features are functional yet.
+- [ ] *Actively under development, not all features are functional yet.*
+
+![rrna_pipeline_procedure](https://cloud.githubusercontent.com/assets/14023091/15032729/e97deba4-1218-11e6-870f-1715e8b116a0.jpg)
 
 Usage
 -----
@@ -39,7 +41,7 @@ The rRNA pipeline will skip previous steps if stopped and rerun, unless -W is sp
 
 If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.  
 
-Basic operation for 16S:
+**Basic operation for 16S:**
 ```bash
 rRNA_pipeline.py -d 16S
 ```
