@@ -11,7 +11,7 @@
 # La Jolla, CA USA
 #
 import sys, re, os, getopt
-import gzip, bz2
+import happyfile
 
 verbose = False
 
@@ -23,46 +23,11 @@ dict_id_taxonomy = {}
 dict_swarm_sample_counts = {}
 dict_swarm_counts = {}
 
-def hopen(infile):
-    f = None
-    try:
-        if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
-        elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
-        else:
-            f = open(infile)
-    except IOError:
-        return None
-    return f
-
-def hopen_or_else(infile):
-    f = hopen(infile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to open file: " + infile
-
-def hopen_write(outfile):
-    f = None
-    try:
-        f = open(outfile, 'w')
-    except IOError:
-        return None
-    return f
-
-def hopen_write_or_else(outfile):
-    f = hopen_write(outfile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
-
 def read_sample_names(sample_names_file):
     global dict_sample_name
     
     if sample_names_file:
-        in_handle = hopen_or_else(sample_names_file)
+        in_handle = happyfile.hopen_or_else(sample_names_file)
     
         if verbose:
             print >>sys.stderr, "Reading sample names file: " + sample_names_file
@@ -90,7 +55,7 @@ def read_counts(counts_file):
     global sample_list
     
     if counts_file:
-        in_handle = hopen_or_else(counts_file)
+        in_handle = happyfile.hopen_or_else(counts_file)
         
         if verbose:
             print >>sys.stderr, "Reading counts file: " + counts_file
@@ -139,7 +104,7 @@ def get_taxonomy(fasta_file, ggsearch_file, database_file, cpus):
                 print >>sys.stderr, "[swarm_classify_taxonomy] ERROR: ggsearch"
                 sys.exit(2)
 
-    in_handle1 = hopen_or_else(ggsearch_file)
+    in_handle1 = happyfile.hopen_or_else(ggsearch_file)
     if verbose:
         print >>sys.stderr, "Reading ggsearch file: " + ggsearch_file
     
@@ -155,7 +120,7 @@ def get_taxonomy(fasta_file, ggsearch_file, database_file, cpus):
             dict_swarm_best_bs[qid] = bs
     in_handle1.close()
 
-    in_handle2 = hopen_or_else(database_file)
+    in_handle2 = happyfile.hopen_or_else(database_file)
     if verbose:
         print >>sys.stderr, "Reading database file: " + database_file
         
@@ -178,7 +143,7 @@ def get_taxonomy(fasta_file, ggsearch_file, database_file, cpus):
 def write_swarms(output_counts_file):
     out_handle = sys.stdout
     if output_counts_file:
-        out_handle = hopen_write_or_else(output_counts_file)
+        out_handle = happyfile.hopen_write_or_else(output_counts_file)
 
     if verbose and output_counts_file:
         print >>sys.stderr, "Writing counts file: " + output_counts_file

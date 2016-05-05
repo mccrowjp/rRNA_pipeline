@@ -10,7 +10,7 @@
 #
 
 import sys, re, os, getopt
-import gzip, bz2
+import happyfile
 
 prog_path = os.path.realpath(sys.argv[0])
 prog_dir = os.path.dirname(prog_path)
@@ -53,41 +53,6 @@ class SequenceFilePair:
             self.pear = file1
         self.chimera = self.basefile + ".uchime"
         self.filtered = self.basefile + ".filtered.fa"
-
-def hopen(infile):
-    f = None
-    try:
-        if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
-        elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
-        else:
-            f = open(infile)
-    except IOError:
-        return None
-    return f
-
-def hopen_or_else(infile):
-    f = hopen(infile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to open file: " + infile
-
-def hopen_write(outfile):
-    f = None
-    try:
-        f = open(outfile, 'w')
-    except IOError:
-        return None
-    return f
-
-def hopen_write_or_else(outfile):
-    f = hopen_write(outfile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
 
 def get_seq_file_pairs(fastq_dir):
     global list_seq_file_pairs
@@ -204,8 +169,8 @@ def remove_plastid_seqs(output_base_file):
         print >>sys.stderr, "Filtering chloroplast sequences"
 
     # split 16S/Plastid swarm taxonomy table
-    in_handle_tax = hopen_or_else(swarm_tax)
-    out_handle_16S_tax = hopen_write_or_else(tmp_swarm_16S_tax)
+    in_handle_tax = happyfile.hopen_or_else(swarm_tax)
+    out_handle_16S_tax = happyfile.hopen_write_or_else(tmp_swarm_16S_tax)
 
     firstline = 1
     while 1:
@@ -230,9 +195,9 @@ def remove_plastid_seqs(output_base_file):
     out_handle_16S_tax.close()
 
     # split 16S/Plastid swarm file
-    in_handle_table = hopen_or_else(swarm_table)
-    out_handle_16S_table = hopen_write_or_else(tmp_swarm_16S_table)
-    out_handle_plastid_table = hopen_write_or_else(swarm_plastid_table)
+    in_handle_table = happyfile.hopen_or_else(swarm_table)
+    out_handle_16S_table = happyfile.hopen_write_or_else(tmp_swarm_16S_table)
+    out_handle_plastid_table = happyfile.hopen_write_or_else(swarm_plastid_table)
     
     while 1:
         line = in_handle_table.readline()
@@ -254,9 +219,9 @@ def remove_plastid_seqs(output_base_file):
     out_handle_plastid_table.close()
 
     # split 16S/Plastid derep FASTA
-    in_handle_derep_fa = hopen_or_else(derep_fa)
-    out_handle_16S_derep_fa = hopen_write_or_else(tmp_derep_16S_fa)
-    out_handle_plastid_derep_fa = hopen_write_or_else(derep_plastid_fa)
+    in_handle_derep_fa = happyfile.hopen_or_else(derep_fa)
+    out_handle_16S_derep_fa = happyfile.hopen_write_or_else(tmp_derep_16S_fa)
+    out_handle_plastid_derep_fa = happyfile.hopen_write_or_else(derep_plastid_fa)
     
     id = ""
     while 1:
@@ -279,9 +244,9 @@ def remove_plastid_seqs(output_base_file):
     out_handle_plastid_derep_fa.close()
     
     # split 16S/Plastid derep counts table
-    in_handle_derep_counts = hopen_or_else(derep_counts)
-    out_handle_16S_derep_counts = hopen_write_or_else(tmp_derep_16S_counts)
-    out_handle_plastid_derep_counts = hopen_write_or_else(derep_plastid_counts)
+    in_handle_derep_counts = happyfile.hopen_or_else(derep_counts)
+    out_handle_16S_derep_counts = happyfile.hopen_write_or_else(tmp_derep_16S_counts)
+    out_handle_plastid_derep_counts = happyfile.hopen_write_or_else(derep_plastid_counts)
     
     firstline = 1
     while 1:
@@ -307,9 +272,9 @@ def remove_plastid_seqs(output_base_file):
     out_handle_plastid_derep_counts.close()
 
     # split 16S/Plastid swarm FASTA
-    in_handle_fa = hopen_or_else(swarm_fa)
-    out_handle_16S_fa = hopen_write_or_else(tmp_swarm_16S_fa)
-    out_handle_plastid_fa = hopen_write_or_else(swarm_plastid_fa)
+    in_handle_fa = happyfile.hopen_or_else(swarm_fa)
+    out_handle_16S_fa = happyfile.hopen_write_or_else(tmp_swarm_16S_fa)
+    out_handle_plastid_fa = happyfile.hopen_write_or_else(swarm_plastid_fa)
 
     id = ""
     while 1:
@@ -332,9 +297,9 @@ def remove_plastid_seqs(output_base_file):
     out_handle_plastid_fa.close()
 
     # split 16S/Plastid swarm counts table
-    in_handle_counts = hopen_or_else(swarm_counts)
-    out_handle_16S_counts = hopen_write_or_else(tmp_swarm_16S_counts)
-    out_handle_plastid_counts = hopen_write_or_else(swarm_plastid_counts)
+    in_handle_counts = happyfile.hopen_or_else(swarm_counts)
+    out_handle_16S_counts = happyfile.hopen_write_or_else(tmp_swarm_16S_counts)
+    out_handle_plastid_counts = happyfile.hopen_write_or_else(swarm_plastid_counts)
 
     firstline = 1
     while 1:
@@ -411,7 +376,7 @@ def init():
     global dict_database_path
     init_file = os.path.join(prog_dir, 'init.txt')
 
-    in_handle = hopen(init_file)
+    in_handle = happyfile.hopen(init_file)
     if in_handle:
         while 1:
             line = in_handle.readline()

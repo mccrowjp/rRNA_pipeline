@@ -11,7 +11,7 @@
 # La Jolla, CA USA
 #
 import sys, re, os, getopt
-import gzip, bz2
+import happyfile
 
 verbose = False
 
@@ -25,46 +25,11 @@ dict_swarm_seq = {}
 dict_id_swarm = {}
 dict_swarm_num_samples = {}
 
-def hopen(infile):
-    f = None
-    try:
-        if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
-        elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
-        else:
-            f = open(infile)
-    except IOError:
-        return None
-    return f
-
-def hopen_or_else(infile):
-    f = hopen(infile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to open file: " + infile
-
-def hopen_write(outfile):
-    f = None
-    try:
-        f = open(outfile, 'w')
-    except IOError:
-        return None
-    return f
-
-def hopen_write_or_else(outfile):
-    f = hopen_write(outfile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
-
 def read_sample_names(sample_names_file):
     global dict_sample_name
     
     if sample_names_file:
-        in_handle = hopen_or_else(sample_names_file)
+        in_handle = happyfile.hopen_or_else(sample_names_file)
     
         if verbose:
             print >>sys.stderr, "Reading sample names file: " + sample_names_file
@@ -109,7 +74,7 @@ def read_counts(counts_file):
     global sample_list
     
     if counts_file:
-        in_handle = hopen_or_else(counts_file)
+        in_handle = happyfile.hopen_or_else(counts_file)
         
         if verbose:
             print >>sys.stderr, "Reading counts file: " + counts_file
@@ -154,7 +119,7 @@ def get_swarms(fasta_file, swarm_file, cpus):
             print >>sys.stderr, "[swarm_map] ERROR: swarm"
             sys.exit(2)
 
-    in_handle1 = hopen_or_else(fasta_file)
+    in_handle1 = happyfile.hopen_or_else(fasta_file)
     while 1:
         line = in_handle1.readline()
         if not line:
@@ -167,7 +132,7 @@ def get_swarms(fasta_file, swarm_file, cpus):
             dict_id_swarm[id] = id
     in_handle1.close()
 
-    in_handle2 = hopen_or_else(swarm_file)
+    in_handle2 = happyfile.hopen_or_else(swarm_file)
     if verbose:
         print >>sys.stderr, "Reading swarm file: " + swarm_file
     
@@ -184,7 +149,7 @@ def get_swarms(fasta_file, swarm_file, cpus):
 
 
 def read_swarm_fasta(fasta_file):
-    in_handle = hopen_or_else(fasta_file)
+    in_handle = happyfile.hopen_or_else(fasta_file)
     
     if verbose:
         print >>sys.stderr, "Reading FASTA file: " + fasta_file
@@ -217,7 +182,7 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
     
     out_handle1 = sys.stdout
     if output_fasta_file:
-        out_handle1 = hopen_write_or_else(output_fasta_file)
+        out_handle1 = happyfile.hopen_write_or_else(output_fasta_file)
 
     if verbose and output_fasta_file:
         print >>sys.stderr, "Writing FASTA file: " + output_fasta_file
@@ -229,7 +194,7 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
     out_handle1.close()
 
     if output_counts_file:
-        out_handle2 = hopen_write_or_else(output_counts_file)
+        out_handle2 = happyfile.hopen_write_or_else(output_counts_file)
 
         if verbose:
             print >>sys.stderr, "Writing counts file: " + output_counts_file
@@ -253,7 +218,7 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
         out_handle2.close()
 
     if output_map_file:
-        out_handle3 = hopen_write_or_else(output_map_file)
+        out_handle3 = happyfile.hopen_write_or_else(output_map_file)
             
         if verbose:
             print >>sys.stderr, "Writing map file: " + output_map_file

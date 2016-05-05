@@ -11,7 +11,7 @@
 # La Jolla, CA USA
 #
 import sys, re, os, getopt
-import gzip, bz2
+import happyfile
 
 prog_path = os.path.realpath(sys.argv[0])
 prog_dir = os.path.dirname(prog_path)
@@ -26,43 +26,8 @@ dict_id_best_hit = {}
 dict_id_best_bs = {}
 dict_id_taxonomy = {}
 
-def hopen(infile):
-    f = None
-    try:
-        if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
-        elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
-        else:
-            f = open(infile)
-    except IOError:
-        return None
-    return f
-
-def hopen_or_else(infile):
-    f = hopen(infile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to open file: " + infile
-
-def hopen_write(outfile):
-    f = None
-    try:
-        f = open(outfile, 'w')
-    except IOError:
-        return None
-    return f
-
-def hopen_write_or_else(outfile):
-    f = hopen_write(outfile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
-
 def read_swarms(swarm_file):
-    in_handle = hopen_or_else(swarm_file)
+    in_handle = happyfile.hopen_or_else(swarm_file)
     if verbose:
         print >>sys.stderr, "Reading swarm file: " + swarm_file
     
@@ -81,7 +46,7 @@ def read_swarm_counts(swarm_counts_file, min_swarm_count):
     dict_swarm_counts = {}
     global dict_derep_ids
 
-    in_handle = hopen_or_else(swarm_counts_file)
+    in_handle = happyfile.hopen_or_else(swarm_counts_file)
     
     if verbose:
         print >>sys.stderr, "Reading swarm counts file: " + swarm_counts_file
@@ -108,12 +73,12 @@ def read_swarm_counts(swarm_counts_file, min_swarm_count):
             dict_derep_ids[id] = 1
 
 def write_swarm_content(fasta_file, swarm_content_fasta_file):
-    in_handle = hopen_or_else(fasta_file)
+    in_handle = happyfile.hopen_or_else(fasta_file)
         
     if verbose:
         print >>sys.stderr, "Reading FASTA file: " + fasta_file
         
-    out_handle = hopen_write_or_else(swarm_content_fasta_file)
+    out_handle = happyfile.hopen_write_or_else(swarm_content_fasta_file)
 
     if verbose:
         print >>sys.stderr, "Writing swarm content FASTA file: " + swarm_content_fasta_file
@@ -163,7 +128,7 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
                 print >>sys.stderr, "[purity_plot] ERROR: ggsearch"
                 sys.exit(2)
 
-    in_handle1 = hopen_or_else(swarm_content_ggsearch_file)
+    in_handle1 = happyfile.hopen_or_else(swarm_content_ggsearch_file)
     if verbose:
         print >>sys.stderr, "Reading ggsearch file: " + swarm_content_ggsearch_file
     
@@ -179,7 +144,7 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
             dict_id_best_bs[qid] = bs
     in_handle1.close()
 
-    in_handle2 = hopen_or_else(database_file)
+    in_handle2 = happyfile.hopen_or_else(database_file)
     if verbose:
         print >>sys.stderr, "Reading database file: " + database_file
         
@@ -201,7 +166,7 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
 
 def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output_purity_pdf):
     if output_swarm_content_tax_file:
-        out_handle1 = hopen_write_or_else(output_swarm_content_tax_file)
+        out_handle1 = happyfile.hopen_write_or_else(output_swarm_content_tax_file)
         if verbose:
             print >>sys.stderr, "Writing swarm content taxonomy file: " + output_swarm_content_tax_file
         
@@ -218,7 +183,7 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
 
         out_handle1.close()
 
-    out_handle2 = hopen_write_or_else(output_swarm_purity_file)
+    out_handle2 = happyfile.hopen_write_or_else(output_swarm_purity_file)
 
     if verbose:
         print >>sys.stderr, "Writing swarm purity file: " + output_swarm_purity_file

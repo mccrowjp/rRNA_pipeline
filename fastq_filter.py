@@ -11,6 +11,7 @@
 # La Jolla, CA USA
 #
 import sys, re, getopt
+import happyfile
 
 dict_chimera_ids = {}
 verbose = False
@@ -21,45 +22,10 @@ count_chimeras = 0
 count_low_quality = 0
 count_passed = 0
 
-def hopen(infile):
-    f = None
-    try:
-        if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
-        elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
-        else:
-            f = open(infile)
-    except IOError:
-        return None
-    return f
-
-def hopen_or_else(infile):
-    f = hopen(infile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to open file: " + infile
-
-def hopen_write(outfile):
-    f = None
-    try:
-        f = open(outfile, 'w')
-    except IOError:
-        return None
-    return f
-
-def hopen_write_or_else(outfile):
-    f = hopen_write(outfile)
-    if f:
-        return f
-    else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
-
 def read_chimeras(chimera_file):
     global dict_chimera_ids
 
-    in_handle = hopen_or_else(chimera_file)
+    in_handle = happyfile.hopen_or_else(chimera_file)
         
     if verbose:
         print >>sys.stderr, "Reading chimera file: " + chimera_file
@@ -109,14 +75,14 @@ def filter_line(out_handle, id, seq, qual, min_quality, min_seq_len, max_seq_len
         print >>out_handle, ">" + id + "\n" + seq
 
 def filter_fastq(fastq_file, output_file, min_quality, min_seq_len, max_seq_len):
-    in_handle = hopen_or_else(fastq_file)
+    in_handle = happyfile.hopen_or_else(fastq_file)
     
     if verbose:
         print >>sys.stderr, "Reading FASTQ file: " + fastq_file
 
     out_handle = sys.stdout
     if output_file:
-        out_handle = hopen_write_or_else(output_file)
+        out_handle = happyfile.hopen_write_or_else(output_file)
 
     if verbose:
         print >>sys.stderr, "Writing FASTA file: " + output_file
