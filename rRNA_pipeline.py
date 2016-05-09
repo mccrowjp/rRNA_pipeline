@@ -360,12 +360,12 @@ def run_purity(output_base_file, database_file):
     run_command('purity', output_base_file + ".swarm.purity", os.path.join(prog_dir, "purity_plot.py"), cmd_params, False)
 
 def run_plot_sample_correlations(output_base_file, title):
-    infile1 = output_base_file + ".swarm.tax"
-    outfile1 = output_base_file + ".swarm.sample_corr.pdf"
+    infile = output_base_file + ".swarm.tax"
+    outfile = output_base_file + ".swarm.sample_corr.pdf"
 
-    cmd_params = " ".join([infile1, outfile1, title])
+    cmd_params = " ".join([infile, outfile, title])
 
-    run_command('plot_sample_correlations', outfile1, os.path.join(prog_dir, "plot_sample_correlations.r"), cmd_params, True)
+    run_command('plot_sample_correlations', outfile, os.path.join(prog_dir, "plot_sample_correlations.r"), cmd_params, True)
 
 def run_plot_taxa_groups(output_base_file):
     swarm_tax_file = output_base_file + ".swarm.tax"
@@ -378,6 +378,21 @@ def run_plot_taxa_groups(output_base_file):
     cmd_params2 = group_counts_file + " " + plot_file
     run_command('plot_taxa_groups', plot_file, os.path.join(prog_dir, "plot_taxa_groups.r"), cmd_params2, True)
 
+def run_plot_diversity(output_base_file):
+    infile = output_base_file + ".swarm.tax"
+    outfile = output_base_file + ".swarm.diversity.pdf"
+    
+    cmd_params = infile + " " + outfile
+    
+    run_command('plot_diversity', outfile, os.path.join(prog_dir, "plot_diversity.r"), cmd_params, True)
+
+def run_plot_heatmap(output_base_file):
+    infile = output_base_file + ".swarm.tax"
+    outfile = output_base_file + ".swarm.heatmap.pdf"
+    
+    cmd_params = infile + " " + outfile
+    
+    run_command('plot_heatmap', outfile, os.path.join(prog_dir, "plot_heatmap.r"), cmd_params, True)
 
 def run_plots(output_base_file, database_name):
     dict_title = {'16S' : '16S', 'V4' : '18S_V4', 'V9' : '18S_V9', 'chloro' : 'Plastid'}
@@ -385,6 +400,8 @@ def run_plots(output_base_file, database_name):
 
     run_plot_sample_correlations(output_base_file, title)
     run_plot_taxa_groups(output_base_file)
+    run_plot_diversity(output_base_file)
+    run_plot_heatmap(output_base_file)
 
 def init():
     global dict_database_path
