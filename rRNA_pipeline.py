@@ -15,6 +15,7 @@ import happyfile
 prog_path = os.path.realpath(sys.argv[0])
 prog_dir = os.path.dirname(prog_path)
 db_dir = os.path.join(prog_dir, 'db')
+taxa_groups_file = os.path.join(prog_dir, 'taxa_groups.txt')
 
 dict_database_path = {'16S' : os.path.join(db_dir,'db_16S.fa'), 'V4' : os.path.join(db_dir,'db_V4.fa'), 'V9' : os.path.join(db_dir,'db_V9.fa'), 'chloro' : os.path.join(db_dir,'db_plastid.fa')}
 
@@ -75,7 +76,7 @@ def get_seq_file_pairs(fastq_dir):
 
 def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
     if overwrite or not os.path.exists(checkfile):
-        print >>sys.stderr, "[rRNA_ORFs] running " + name + " " + checkfile
+        print >>sys.stderr, "[rRNA_pipeline] running " + name + " " + checkfile
 
         cmd = cmd_exe + " "
         if verbose and not redirect_all:
@@ -89,10 +90,10 @@ def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
 
         rc = os.system(cmd)
         if rc != 0:
-            print >>sys.stderr, "[rRNA_ORFs] ERROR: " + name
+            print >>sys.stderr, "[rRNA_pipeline] ERROR: " + name
             sys.exit(2)
     else:
-        print >>sys.stderr, "[rRNA_ORFs] skipping " + name + " " + checkfile
+        print >>sys.stderr, "[rRNA_pipeline] skipping " + name + " " + checkfile
 
 def run_merge_fastq(fp):
     if fp.ispaired:
@@ -140,7 +141,7 @@ def run_classify(output_base_file, database_name):
     
     cmd_params = " ".join(["-t", str(cpus), "-f", swarm_fa, "-g", ggsearch_file, "-d", database_file, "-c", swarm_counts, "-o", outfile])
     
-    run_command('classifiy', outfile, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
+    run_command('classify', outfile, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
 
 def remove_plastid_seqs(output_base_file):
     dict_plastid = {}
@@ -337,19 +338,17 @@ def remove_plastid_seqs(output_base_file):
         sys.exit(2)
 
 def run_classify_chloro(output_base_file, database_file):
-    swarm_counts = output_base_file + ".swarm.counts"
+    swarm_counts = output_base_file + ".plastid.swarm.counts"
     swarm_plastid_fa = output_base_file + ".plastid.swarm.fa"
     ggsearch_file = output_base_file + ".plastid.swarm.ggsearch"
     swarm_plastid_tax = output_base_file + ".plastid.swarm.tax"
     
     if overwrite or not os.path.exists(swarm_plastid_fa):
         remove_plastid_seqs(output_base_file)
-    else:
-        print sys.stderr, "[rRNA_pipeline] skipping classify_plastid"
 
     cmd_params = " ".join(["-t", str(cpus), "-f", swarm_plastid_fa, "-g", ggsearch_file, "-d", database_file, "-c", swarm_counts, "-o", swarm_plastid_tax])
     
-    run_command('classifiy_plastid', swarm_plastid_tax, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
+    run_command('classify_plastid', swarm_plastid_tax, os.path.join(prog_dir, "swarm_classify_taxonomy.py"), cmd_params, False)
 
 def run_purity(output_base_file, database_file):
     derep_fa = output_base_file + ".derep.fa"
@@ -360,10 +359,7 @@ def run_purity(output_base_file, database_file):
 
     run_command('purity', output_base_file + ".swarm.purity", os.path.join(prog_dir, "purity_plot.py"), cmd_params, False)
 
-def run_plots(output_base_file, database_name):
-    dict_title = {'16S' : '16S', 'V4' : '18S_V4', 'V9' : '18S_V9', 'chloro' : 'Plastid'}
-    title = dict_title.get(database_name, "")
-    
+def run_plot_sample_correlations(output_base_file, title):
     infile1 = output_base_file + ".swarm.tax"
     outfile1 = output_base_file + ".swarm.sample_corr.pdf"
 
@@ -371,9 +367,28 @@ def run_plots(output_base_file, database_name):
 
     run_command('plot_sample_correlations', outfile1, os.path.join(prog_dir, "plot_sample_correlations.r"), cmd_params, True)
 
+def run_plot_taxa_groups(output_base_file):
+    swarm_tax_file = output_base_file + ".swarm.tax"
+    group_counts_file = output_base_file + ".taxa_groups.txt"
+    plot_file = output_base_file + ".taxa_groups.pdf"
+
+    cmd_params1 = " ".join(["-f", swarm_tax_file, "-g", taxa_groups_file, "-o", group_counts_file])
+    run_command('group_taxa', group_counts_file, os.path.join(prog_dir, "group_taxa.py"), cmd_params1, False)
+
+    cmd_params2 = group_counts_file + " " + plot_file
+    run_command('plot_taxa_groups', plot_file, os.path.join(prog_dir, "plot_taxa_groups.r"), cmd_params2, True)
+
+
+def run_plots(output_base_file, database_name):
+    dict_title = {'16S' : '16S', 'V4' : '18S_V4', 'V9' : '18S_V9', 'chloro' : 'Plastid'}
+    title = dict_title.get(database_name, "")
+
+    run_plot_sample_correlations(output_base_file, title)
+    run_plot_taxa_groups(output_base_file)
 
 def init():
     global dict_database_path
+    global taxa_groups_file
     init_file = os.path.join(prog_dir, 'init.txt')
 
     in_handle = happyfile.hopen(init_file)
@@ -397,7 +412,12 @@ def init():
                             path = os.path.join(prog_dir, path)
                     if os.path.exists(path):
                         dict_database_path[db] = value
-        
+                if key == 'taxa_groups':
+                    if os.path.exists(value):
+                        taxa_groups_file = value
+                    else:
+                        taxa_groups_file = os.path.join(prog_dir, value)
+    
         in_handle.close()
 
 
@@ -413,6 +433,7 @@ def main(argv):
         "   -q dir          : FASTQ folder",
         "   -o file         : base filename for results (default: rrna)",
         "   -n file         : sample names file (optional)",
+        "   -p              : skip OTU purity calculation/plots",
         "   -t, --cpus int  : number of processes (default: 1)",
         "   -W, --overwrite : overwrite files (default: No, run next step)",
         "   -h, --help      : help",
@@ -425,10 +446,11 @@ def main(argv):
     database_file = ""
     fastq_dir = ""
     sample_names_file = ""
+    skip_purity = False
     output_base_file = "rrna"
     
     try:
-        opts, args = getopt.getopt(argv[1:], "d:q:o:n:t:Whv", ["overwrite", "cpus=", "help", "verbose", "test"])
+        opts, args = getopt.getopt(argv[1:], "d:q:o:n:pt:Whv", ["overwrite", "cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
         print >>sys.stderr, help
         sys.exit(2)
@@ -448,6 +470,8 @@ def main(argv):
             output_base_file = arg
         elif opt == '-n':
             sample_names_file = arg
+        elif opt == '-p':
+            skip_purity = True
         elif opt in ("-t", "--cpus"):
             cpus = int(re.sub('=','', arg))
         elif opt in ("-W", "--overwrite"):
@@ -499,7 +523,7 @@ def main(argv):
             run_usearch(fp, database_file)
             run_filter(fp)
     else:
-        print >>sys.stderr, "[rRNA_ORFs] skipping FASTQ merge/chimera/filtering"
+        print >>sys.stderr, "[rRNA_pipeline] skipping FASTQ merge/chimera/filtering"
     
     run_dereplicate(output_base_file, sample_names_file)
     run_swarm(output_base_file)
@@ -509,10 +533,12 @@ def main(argv):
     if database_name == '16S':
         run_classify_chloro(output_base_file, dict_database_path['chloro'])
         run_plots(output_base_file + ".plastid", 'chloro')
-        run_purity(output_base_file + ".plastid", dict_database_path['chloro'])
+        if not skip_purity:
+            run_purity(output_base_file + ".plastid", dict_database_path['chloro'])
 
     run_plots(output_base_file, database_name)
-    run_purity(output_base_file, database_file)
+    if not skip_purity:
+        run_purity(output_base_file, database_file)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,35 @@
+Centric Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Polar-centric
+Centric Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Radial-centric
+Pennate Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Raphid-pennate
+Pennate Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Araphid-pennate
+Other Stramenopiles	Eukaryota;Stramenopiles
+Rhizaria	Eukaryota;Rhizaria
+Excavata	Eukaryota;Excavata
+Chlorophyta	Eukaryota;Archaeplastida;Chlorophyta
+Cryptophyta	Eukaryota;Hacrobia;Cryptophyta
+Ciliophora	Eukaryota;Alveolata;Ciliophora
+Dinophyta	Eukaryota;Alveolata;Dinophyta
+Haptophyta	Eukaryota;Hacrobia;Haptophyta
+Amoebozoa	Eukaryota;Amoebozoa
+Metazoa	Eukaryota;Opisthokonta;Metazoa
+Fungi	Eukaryota;Opisthokonta;Fungi
+Desulfovibrio	Bacteria;Desulfovibrionaceae;Desulfovibrio
+Rhodobacteraceae	Bacteria;Rhodobacteraceae
+Other Eukaryota	Eukaryota
+
+Alphaproteobacteria	Bacteria;Proteobacteria;Alphaproteobacteria
+Betaproteobacteria	Bacteria;Proteobacteria;Betaproteobacteria
+Deltaproteobacteria	Bacteria;Proteobacteria;Deltaproteobacteria
+Epsilonproteobacteria	Bacteria;Proteobacteria;Epsilonproteobacteria
+Gammaproteobacteria	Bacteria;Proteobacteria;Gammaproteobacteria
+Actinobacteria	Bacteria;Actinobacteria
+Cyanobacteria	Bacteria;Cyanobacteria
+Bacteroidetes	Bacteria;Bacteroidetes
+Planctomycetes	Bacteria;Planctomycetes
+Deferribacteres	Bacteria;Deferribacteres
+Verrucomicrobia	Bacteria;Verrucomicrobia
+Other Bacteria	Bacteria
+
+Euryarchaeota	Archaea;Euryarchaeota
+Thaumarchaeota	Archaea;Thaumarchaeota
+Other Archaea	Archaea
