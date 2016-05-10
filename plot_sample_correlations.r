@@ -26,7 +26,9 @@ if(intable == 'NA' || outpdf == 'NA') {
 } else {
     if(intitle == 'NA') { intitle = "" }
     dat = read.table(intable, sep="\t", header=T, comment="")
-    pdf(outpdf)
-    plot_sample_corr(dat, title=intitle)
-    dev.off()
+    if(ncol(dat) >= 6) { # Tree not necessary for fewer than 3 samples
+        pdf(outpdf)
+        plot_sample_corr(dat, title=intitle)
+        dev.off()
+    }
 }
