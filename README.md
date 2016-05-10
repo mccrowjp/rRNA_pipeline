@@ -33,6 +33,7 @@ Usage: rRNA_pipeline.py (options)
 -q dir          : FASTQ folder
 -o file         : base filename for results (default: rrna)
 -n file         : sample names file (optional)
+-p              : skip OTU purity calculation/plots
 -t, --cpus int  : number of processes (default: 1)
 -W, --overwrite : overwrite files (default: No, run next step)
 -h, --help      : help
@@ -41,7 +42,7 @@ Usage: rRNA_pipeline.py (options)
 
 The rRNA pipeline will skip previous steps if stopped and rerun, unless -W is specified.  To rerun a step, delete the output files created during that step.
 
-If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.  
+If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.
 
 **Basic operation for 16S:**
 ```bash
@@ -50,9 +51,11 @@ rRNA_pipeline.py -d 16S
 
 To replace FASTQ filenames with sample names in all output, use -n to specify tab-delimited file (sample_name, FASTQ base name).  FASTQ base names may be followed by any of [_R1, _R2, .filtered, .fastq, .fq] in the full FASTQ file name.  
 
-**Use the following for 18S V4, with sample names, run on 4 CPUs:**
+The basic pipeline runs relatively quickly, however the extra calculation of OTU purity takes much longer.  Use -p to skip the purity calculation.
+
+**Use the following for 18S V4, with sample names, run on 4 CPUs, no purity plot:**
 ```bash
-rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4
+rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4 -p
 ```
 
 *Output files, created in the following order:*
