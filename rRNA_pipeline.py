@@ -9,7 +9,8 @@
 # La Jolla, CA USA
 #
 
-import sys, re, os, getopt
+import sys, re, getopt
+import os, shutil
 import happyfile
 
 prog_path = os.path.realpath(sys.argv[0])
@@ -54,6 +55,13 @@ class SequenceFilePair:
             self.pear = file1
         self.chimera = self.basefile + ".uchime"
         self.filtered = self.basefile + ".filtered.fa"
+
+# For compatability with different operating systems
+def replace_file(src, dst):
+    if os.path.exists(src):
+        if os.path.exists(dst):
+            os.remove(dst)
+        shutil.move(src, dst)
 
 def get_seq_file_pairs(fastq_dir):
     global list_seq_file_pairs
@@ -327,12 +335,12 @@ def remove_plastid_seqs(output_base_file):
 
     # replace original swarm files with 16S only
     if os.path.exists(tmp_derep_16S_fa) and os.path.exists(tmp_derep_16S_counts) and os.path.exists(tmp_swarm_16S_table) and os.path.exists(tmp_swarm_16S_tax) and os.path.exists(tmp_swarm_16S_fa) and os.path.exists(tmp_swarm_16S_counts):
-        os.system("mv " + tmp_derep_16S_fa + " " + derep_fa)
-        os.system("mv " + tmp_derep_16S_counts + " " + derep_counts)
-        os.system("mv " + tmp_swarm_16S_table + " " + swarm_table)
-        os.system("mv " + tmp_swarm_16S_tax + " " + swarm_tax)
-        os.system("mv " + tmp_swarm_16S_fa + " " + swarm_fa)
-        os.system("mv " + tmp_swarm_16S_counts + " " + swarm_counts)
+        replace_file(tmp_derep_16S_fa, derep_fa)
+        replace_file(tmp_derep_16S_counts, derep_counts)
+        replace_file(tmp_swarm_16S_table, swarm_table)
+        replace_file(tmp_swarm_16S_tax, swarm_tax)
+        replace_file(tmp_swarm_16S_fa, swarm_fa)
+        replace_file(tmp_swarm_16S_counts, swarm_counts)
     else:
         print >>sys.stderr, "Not all tmp_ files found"
         sys.exit(2)
@@ -437,6 +445,84 @@ def init():
     
         in_handle.close()
 
+def test_each_dependency(cmd, name):
+    failed = 0
+    try:
+        rc = os.system("which " + cmd + " &>/dev/null")
+    except Exception:
+        rc = 1
+    if rc:
+        failed = 1
+        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: " + name + " failed"
+    else:
+        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: " + name + " passed"
+    return failed
+
+def test_dependencies():
+    failed = 0
+    failed += test_each_dependency("pear", "PEAR")
+    failed += test_each_dependency("usearch", "USEARCH")
+    failed += test_each_dependency("swarm", "SWARM")
+    failed += test_each_dependency("glsearch36", "FASTA36")
+    if failed:
+        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: " + str(failed) + " test(s) failed"
+    else:
+        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: All tests passed"
+    return failed
+
+def test_databases():
+    failed = 0
+    try:
+        init()
+    except Exception:
+        failed = 1
+    for db in ('16S', 'V4', 'V9', 'chloro'):
+        if os.path.exists(dict_database_path.get(db, "")):
+            print >>sys.stderr, "[rRNA_pipeline] test_databases: " + db + " found"
+        else:
+            print >>sys.stderr, "[rRNA_pipeline] test_databases: " + db + " database not found"
+            failed += 1
+    if failed:
+        print >>sys.stderr, "[rRNA_pipeline] test_databases: " + str(failed) + " test(s) failed"
+    else:
+        print >>sys.stderr, "[rRNA_pipeline] test_databases: All tests passed"
+    return failed
+
+def test_each_script(script):
+    failed = 0
+    full_script = os.path.join(prog_dir, script)
+    try:
+        rc = os.system(full_script + " --test")
+    except Exception:
+        rc = 1
+    if rc:
+        failed = 1
+    return failed
+
+def test_scripts():
+    failed = 0
+    failed += test_each_script("fastq_filter.py")
+    failed += test_each_script("fasta_dereplicate.py")
+    failed += test_each_script("swarm_map.py")
+    failed += test_each_script("swarm_classify_taxonomy.py")
+    failed += test_each_script("purity_plot.py")
+    failed += test_each_script("group_taxa.py")
+    if failed:
+        print >>sys.stderr, "[rRNA_pipeline] test_scripts: " + str(failed) + " test(s) failed"
+    else:
+        print >>sys.stderr, "[rRNA_pipeline] test_scripts: All tests passed"
+    return failed
+
+def test_all():
+    failed = 0
+    failed += test_dependencies()
+    failed += test_databases()
+    failed += test_scripts()
+    if failed:
+        print >>sys.stderr, "[rRNA_pipeline] test_all: " + str(failed) + " test(s) failed"
+        sys.exit(2)
+    else:
+        print >>sys.stderr, "[rRNA_pipeline] test_all: All tests passed"
 
 ###
 

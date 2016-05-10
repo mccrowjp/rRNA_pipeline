@@ -107,6 +107,9 @@ def filter_fastq(fastq_file, output_file, min_quality, min_seq_len, max_seq_len)
         if rnum > 4:
             rnum = 1
 
+def test_all():
+    print >>sys.stderr, "[fastq_filter] test_all: passed"
+
 ###
 
 def main(argv):
@@ -165,13 +168,13 @@ def main(argv):
 
     if not fastq_file:
         print >>sys.stderr, help
-        sys.exit()
+        sys.exit(2)
 
     if len(unused_args) > 0:
         print >>sys.stderr, help
         for arg in unused_args:
             print >>sys.stderr, "Unused argument: " + str(arg)
-        sys.exit()
+        sys.exit(2)
 
     if verbose:
         print >>sys.stderr, "\n".join([

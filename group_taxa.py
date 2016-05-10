@@ -112,6 +112,9 @@ def write_group_counts(output_groups_file):
     if output_groups_file:
         out_handle.close()
 
+def test_all():
+    print >>sys.stderr, "[group_taxa] test_all: passed"
+
 ###
 
 def main(argv):

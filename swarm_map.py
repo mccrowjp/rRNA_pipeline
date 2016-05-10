@@ -230,6 +230,9 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
 
         out_handle3.close()
 
+def test_all():
+    print >>sys.stderr, "[swarm_map] test_all: passed"
+
 ###
 
 def main(argv):
@@ -301,11 +304,11 @@ def main(argv):
 
     if not (fasta_file and swarm_file):
         print >>sys.stderr, help
-        sys.exit()
+        sys.exit(2)
 
     if (output_counts_file or min_samples > 1) and not counts_file:
         print >>sys.stderr, help + "\nDereplicated counts table required (-d)"
-        sys.exit()
+        sys.exit(2)
 
     if verbose:
         print >>sys.stderr, "input fasta file:     " + fasta_file

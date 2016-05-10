@@ -235,6 +235,28 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
         print >>sys.stderr, "[purity_plot] ERROR: " + R_script
         sys.exit(2)
 
+def test_progs():
+    passed = True
+    try:
+        rc = os.system("which glsearch36")
+    except Exception:
+        rc = 1
+    if rc:
+        passed = False
+
+    if not os.path.exists(R_script):
+        passed = False
+
+    if passed:
+        print >>sys.stderr, "[purity_plot] test_progs: passed"
+    else:
+        print >>sys.stderr, "[purity_plot] test_progs: failed"
+    return passed
+
+def test_all():
+    if not test_progs():
+        sys.exit(2)
+
 ###
 
 def main(argv):
@@ -299,7 +321,7 @@ def main(argv):
 
     if not (fasta_file and swarm_file and swarm_counts_file and base_file and database_file):
         print >>sys.stderr, help
-        sys.exit()
+        sys.exit(2)
 
     swarm_content_ggsearch_file = base_file + ".content.ggsearch"
     swarm_content_fasta_file = base_file + ".content.fa"

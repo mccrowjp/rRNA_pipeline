@@ -167,6 +167,23 @@ def write_dereps(fasta_files, output_fasta_file, output_counts_file, output_map_
 
         out_handle3.close()
 
+def test_derep():
+    retval = True
+    seq = "acgtcatgcatctagctactacgagcacgatcatcgtagc"
+    key = "6db096a7187e871007152ab79c856ec7d50236b6"
+    derep_line("testid1", seq, 1)
+    derep_line("testid2", seq, 2)
+    if dict_id_counts.get(key,0) == 2 and dict_id_file_counts.get((key, 1),0) == 1 and dict_id_map.get("testid2","") == key and dict_id_seq.get(key, "") == seq:
+        print >>sys.stderr, "[fasta_dereplicate] test_derep: passed"
+    else:
+        print >>sys.stderr, "[fasta_dereplicate] test_derep: failed"
+        retval = False
+    return retval
+
+def test_all():
+    if not test_derep():
+        sys.exit(2)
+
 ###
 
 def main(argv):
@@ -232,7 +249,7 @@ def main(argv):
         fasta_files = args
     else:
         print >>sys.stderr, help
-        sys.exit()
+        sys.exit(2)
 
     if verbose:
         if len(fasta_files) > 1:

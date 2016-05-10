@@ -1,8 +1,6 @@
 # rRNA_pipeline
 #### Pipeline for read filtering, swarm OTU clustering, and taxonomic classification of ssu-rRNA
 
-- [ ] *Actively under development, not all features are functional yet.*
-
 ![rrna_pipeline_procedure](https://cloud.githubusercontent.com/assets/14023091/15032729/e97deba4-1218-11e6-870f-1715e8b116a0.jpg)
 
 Usage
@@ -18,9 +16,13 @@ Usage
 | fasta_dereplicate.py | FASTA dereplication |
 | swarm_map.py | run swarm |
 | swarm_classify_taxonomy.py | classify swarm OTUs |
+| group_taxa.py | aggregate taxonomic group counts
 | purity_plot.py | classifify OTU content |
 | plot_OTU_purity.r | produce OTU purity plot |
 | plot_sample_correlations.r | produce sample tree plot |
+| plot_taxa_groups.r | produce taxonomic groups plot |
+| plot_diversity.r | produce sample diversity plot |
+| plot_heatmap.r | produce sample/OTU heatmap |
 
 ```
 rRNA_pipeline v0.2 (May 3, 2016)
@@ -48,7 +50,7 @@ rRNA_pipeline.py -d 16S
 
 To replace FASTQ filenames with sample names in all output, use -n to specify tab-delimited file (sample_name, FASTQ base name).  FASTQ base names may be followed by any of [_R1, _R2, .filtered, .fastq, .fq] in the full FASTQ file name.  
 
-Use the following for 18S V4, with sample names, run on 4 CPUs:
+**Use the following for 18S V4, with sample names, run on 4 CPUs:**
 ```bash
 rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4
 ```
@@ -73,6 +75,10 @@ rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4
 | rrna.swarm.ggsearch | Fasta36 m8 output |
 | rrna.swarm.tax | swarm OTU taxonomy and counts table |
 | rrna.swarm.sample_corr.pdf | plot of sample correlation tree |
+| rrna.swarm.diversity.pdf | plots of sample richness/diversity metrics |
+| rrna.swarm.heatmap.pdf | plot of normalized sample OTU abundance |
+| rrna.taxa_groups.txt | aggregated counts for taxonomic groups |
+| rrna.taxa_groups.pdf | plot of taxonomic group counts |
 | rrna.swarm.content.fa | dereplicated reads in largest swarm clusters |
 | rrna.swarm.content.ggsearch | Fasta36 m8 output |
 | rrna.swarm.content.tax | swarm content taxonomy |
@@ -87,7 +93,7 @@ Installation
 ------------
 
 1. Make sure all dependencies are installed (see below), and make them accessible to your path.
-2. Databases based on PR2 with updated taxonomy are included in db/.  Use gunzip to uncompress these files.
+2. Databases derived from PR2 with updated taxonomy are included in db/.  Use gunzip to uncompress these files.
 3. Download SILVA NR database (http://www.arb-silva.de/), and add to db/ if you want to use 16S
 4. Test the rRNA pipeline:
 

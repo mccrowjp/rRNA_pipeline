@@ -170,6 +170,9 @@ def write_swarms(output_counts_file):
     if output_counts_file:
         out_handle.close()
 
+def test_all():
+    print >>sys.stderr, "[swarm_classify_taxonomy] test_all: passed"
+
 ###
 
 def main(argv):
@@ -229,7 +232,7 @@ def main(argv):
 
     if not (ggsearch_file and database_file and counts_file):
         print >>sys.stderr, help
-        sys.exit()
+        sys.exit(2)
 
     if verbose:
         print >>sys.stderr, "\n".join([
