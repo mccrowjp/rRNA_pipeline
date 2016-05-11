@@ -122,6 +122,8 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
             
             if verbose:
                 print >>sys.stderr, cmd
+            else:
+                cmd += " 2>/dev/null"
             
             rc = os.system(cmd)
             if rc != 0:

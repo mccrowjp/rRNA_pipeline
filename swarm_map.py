@@ -113,6 +113,7 @@ def get_swarms(fasta_file, swarm_file, cpus):
         
         if verbose:
             print >>sys.stderr, cmd
+        else:
             cmd += " &>/dev/null"
         
         rc = os.system(cmd)
