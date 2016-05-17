@@ -215,8 +215,6 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
 
     print >>out_handle2, "\t".join(['swarm_id', 'taxonomy', 'size', 'same_taxon', 'purity'])
 
-    print >>sys.stderr, str(len(count_all)) + " " + str(len(count_same_tax))
-
     count_pure_OTUs = 0
     for swarm_id in count_all:
         print >>out_handle2, "\t".join([swarm_id, dict_id_taxonomy.get(swarm_id, ""), str(count_all[swarm_id]), str(count_same_tax.get(swarm_id, 0)), str(1.0 * count_same_tax.get(swarm_id, 0) / count_all[swarm_id])])
