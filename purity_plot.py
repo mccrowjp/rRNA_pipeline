@@ -223,7 +223,8 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
 
     out_handle2.close()
 
-    print >>sys.stderr, "OTUs 100% purity: " + str(count_pure_OTUs) + " / " + str(len(count_all)) + " (" + str(round(100.0 * count_pure_OTUs / len(count_all), 1)) + "%)"
+    if len(count_all):
+        print >>sys.stderr, "OTUs 100% purity: " + str(count_pure_OTUs) + " / " + str(len(count_all)) + " (" + str(round(100.0 * count_pure_OTUs / len(count_all), 1)) + "%)"
 
     cmd = " ".join([R_script, output_swarm_purity_file, output_purity_pdf])
 
