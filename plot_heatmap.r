@@ -20,7 +20,7 @@ plot_heatmap = function(x, fontsize=1, ...) {
     xmat = xmat + 0.1
     xmat = sweep(xmat,2,colSums(xmat),`/`)
     xmat.n = log(xmat, 10)
-    heatmap(t(xmat.n), labCol="", scale="none", Colv=colSums(xmat), margins=c(2,10))
+    heatmap(t(xmat.n), labCol="", scale="none", Colv=colSums(xmat), margins=c(2,10), col=colorRampPalette(c("white","red","darkred"))(64))
 }
 
 if(intable == 'NA' || outpdf == 'NA') {
