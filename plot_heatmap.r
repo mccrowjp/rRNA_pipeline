@@ -17,9 +17,10 @@ outpdf = paste("", args[2], sep="")
 plot_heatmap = function(x, fontsize=1, ...) {
     xmat = as.matrix(x[,-(1:3)])
     sample = colnames(xmat)
-    csum = apply(xmat,2,sum)
-    xmat.n = log((xmat+0.1)/csum)
-    heatmap(t(xmat.n), labCol="", scale="none", Colv=csum, margins=c(2,10))
+    xmat = xmat + 0.1
+    xmat = sweep(xmat,2,colSums(xmat),`/`)
+    xmat.n = log(xmat, 10)
+    heatmap(t(xmat.n), labCol="", scale="none", Colv=colSums(xmat), margins=c(2,10))
 }
 
 if(intable == 'NA' || outpdf == 'NA') {

@@ -18,8 +18,7 @@ intitle = paste("", args[3], sep="")
 plot_heatmap = function(x, fontsize=1, min.taxa.frac=0, ...) {
     xmat = as.matrix(x[,-1])
     rownames(xmat) = x[,1]
-    csum = apply(xmat,2,sum)
-    xmat = xmat/csum
+    xmat = sweep(xmat,2,colSums(xmat),`/`)
     rsum = apply(xmat,1,sum)
     xmat = xmat[rsum >= min.taxa.frac,]
     rsum = apply(xmat,1,sum)
@@ -28,8 +27,7 @@ plot_heatmap = function(x, fontsize=1, min.taxa.frac=0, ...) {
 
 plot_taxa_groups = function(x, fontsize=1, min.taxa.frac=0, title="", ...) {
     xmat = as.matrix(x[,-1])
-    csum = apply(xmat,2,sum)
-    xmat = xmat/csum
+    xmat = sweep(xmat,2,colSums(xmat),`/`)
     rmean = apply(xmat, 1, mean)
     rsd = apply(xmat, 1, sd)
     par(mar=c(12,5,5,2))

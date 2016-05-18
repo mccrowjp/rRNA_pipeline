@@ -17,16 +17,15 @@ outpdf = paste("", args[2], sep="")
 plot_diversity = function(x, fontsize=1, ...) {
     xmat = as.matrix(x[,-(1:3)])
     sample = colnames(xmat)
-    csum = apply(xmat,2,sum)
-    xmat.p = xmat/csum
+    xmat.p = sweep(xmat,2,colSums(xmat),`/`)
     
     richness = apply(xmat, 2, function(x) length(x[x>0]))
-    shannon = -apply(xmat.p, 2, function(x) {y=x[x>0]; z=y*log(y,2); sum(z)})
-    simpson = 1-apply(xmat.p, 2, function(x) sum(x^2))
+    shannon = apply(xmat.p, 2, function(x) {y=x[x>0]; z=y*log(y); -sum(z)})
+    simpson = apply(xmat.p, 2, function(x) 1-sum(x^2))
 
     par(mar=c(10,4,5,2))
     barplot(richness, las=2, main="Richness (total OTUs)", cex.names=0.8*fontsize, space=0)
-    barplot(shannon, las=2, main="Shannon-Wiener diversity", cex.names=0.8*fontsize, space=0)
+    barplot(shannon, las=2, main="Shannon diversity", cex.names=0.8*fontsize, space=0)
     barplot(simpson, las=2, main="Simpson diversity", cex.names=0.8*fontsize, space=0)
 }
 
