@@ -265,7 +265,7 @@ def main(argv):
         "purity_plot v0.2 (May 3, 2016)",
         "swarm OTU purity calculate and plot PDF",
         "",
-        "Usage: "+argv[0]+" (options)",
+        "Usage: " + os.path.basename(argv[0]) + " (options)",
         "   -f file        : dereplicated FASTA",
         "   -s file        : swarm file",
         "   -c file        : swarm counts file",

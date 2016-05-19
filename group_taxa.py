@@ -122,7 +122,7 @@ def main(argv):
         "group_taxa v0.2 (May 3, 2016)",
         "merge OTU counts by taxonomic groups",
         "",
-        "Usage: "+argv[0]+" (options)",
+        "Usage: " + os.path.basename(argv[0]) + " (options)",
         "   -f file        : swarm taxonomy file",
         "   -g file        : taxonomic groups file",
         "   -o file        : output group counts file (default: stdout)",

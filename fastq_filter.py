@@ -10,7 +10,7 @@
 # J. Craig Venter Institute (JCVI)
 # La Jolla, CA USA
 #
-import sys, re, getopt
+import sys, re, os, getopt
 import happyfile
 
 dict_chimera_ids = {}
@@ -117,7 +117,7 @@ def main(argv):
         "fastq_filter v0.2 (May 3, 2016)",
         "Filter FASTQ file for length, quality, and chimeras (usearch)",
         "",
-        "Usage: "+argv[0]+" (options)",
+        "Usage: " + os.path.basename(argv[0]) + " (options)",
         "   -f file        : FASTQ file (required)",
         "   -o file        : output FASTA file (default: stdout)",
         "   -c file        : usearch -uchime_ref output (optional)",

@@ -10,7 +10,7 @@
 # J. Craig Venter Institute (JCVI)
 # La Jolla, CA USA
 #
-import sys, re, getopt
+import sys, re, os, getopt
 import gzip, bz2
 import happyfile
 import sha
@@ -149,7 +149,7 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
             if file in dict_sample_name:
                 column_names.append(dict_sample_name[file])
             else:
-                column_names.append(file)
+                column_names.append(re.sub('\.filtered\.fa$', '', file))
 
         print >>out_handle2, "\t".join(column_names)
 
@@ -205,7 +205,7 @@ def main(argv):
         "fasta_dereplicate v0.2 (May 3, 2016)",
         "Dereplicate FASTA",
         "",
-        "Usage: "+argv[0]+" (options) [FASTA file(s)...]",
+        "Usage: " + os.path.basename(argv[0]) + " (options) [FASTA file(s)...]",
         "   -o file        : output FASTA file (default: stdout)",
         "   -c file        : output sample counts file",
         "   -m file        : output ID map table",

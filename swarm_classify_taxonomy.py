@@ -180,7 +180,7 @@ def main(argv):
         "swarm_classify_taxonomy v0.2 (May 3, 2016)",
         "swarm OTU add taxonomy to counts table",
         "",
-        "Usage: "+argv[0]+" (options)",
+        "Usage: " + os.path.basename(argv[0]) + " (options)",
         "   -f file        : swarm FASTA",
         "   -g file        : ggsearch -m8 file",
         "   -d file        : database FASTA file",

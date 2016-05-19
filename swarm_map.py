@@ -242,7 +242,7 @@ def main(argv):
         "swarm_map v0.2 (May 3, 2016)",
         "swarm OTU FASTA, sample counts, and id mapping",
         "",
-        "Usage: "+argv[0]+" (options)",
+        "Usage: " + os.path.basename(argv[0]) + " (options)",
         "   -f file        : dereplicated FASTA (required)",
         "   -s file        : swarm file (required)",
         "   -d file        : dereplicated counts table (required if -c)",

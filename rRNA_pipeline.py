@@ -76,7 +76,7 @@ def get_seq_file_pairs(fastq_dir):
                     list_seq_file_pairs.append(SequenceFilePair(f1, f2, True))
                 else:
                     list_seq_file_pairs.append(SequenceFilePair(f1, '', False))
-                    print >>sys.stderr, "Pair not found: " + f2
+
         else:
             m2 = re.search('^(.+)\.(fastq|fq)$', file)
             if m2:
@@ -531,7 +531,7 @@ def main(argv):
         "rRNA_pipeline v0.2 (May 3, 2016)",
         "Full ssu-rRNA, swarm OTU classification pipeline",
         "",
-        "Usage: "+argv[0]+" (options)",
+        "Usage: " + os.path.basename(prog_path) + " (options)",
         "   -d name         : database name (16S, V4, V9)",
         "   -q dir          : FASTQ folder",
         "   -o file         : base filename for results (default: rrna)",
