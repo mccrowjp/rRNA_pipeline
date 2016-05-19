@@ -114,8 +114,8 @@ def run_usearch(fp, database_file):
     
     run_command('chimera', fp.chimera, "usearch", cmd_params, True)
 
-def run_filter(fp):
-    cmd_params = " ".join(["-f", fp.pear, "-o", fp.filtered, "-c", fp.chimera])
+def run_filter(fp, min_quality_score):
+    cmd_params = " ".join(["-f", fp.pear, "-o", fp.filtered, "-c", fp.chimera, "-q", str(min_quality_score)])
     
     run_command('filter', fp.filtered, os.path.join(prog_dir, "fastq_filter.py"), cmd_params, False)
 
@@ -537,6 +537,7 @@ def main(argv):
         "   -o file         : base filename for results (default: rrna)",
         "   -n file         : sample names file (optional)",
         "   -p              : skip OTU purity calculation/plots",
+        "   -m int          : minimum quality score for FASTQ (default: 35)",
         "   -t, --cpus int  : number of processes (default: 1)",
         "   -W, --overwrite : overwrite files (default: No, run next step)",
         "   -h, --help      : help",
@@ -551,9 +552,10 @@ def main(argv):
     sample_names_file = ""
     skip_purity = False
     output_base_file = "rrna"
+    min_quality_score = 35
     
     try:
-        opts, args = getopt.getopt(argv[1:], "d:q:o:n:pt:Whv", ["overwrite", "cpus=", "help", "verbose", "test"])
+        opts, args = getopt.getopt(argv[1:], "d:q:o:n:pm:t:Whv", ["overwrite", "cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
         print >>sys.stderr, help
         sys.exit(2)
@@ -575,6 +577,8 @@ def main(argv):
             sample_names_file = arg
         elif opt == '-p':
             skip_purity = True
+        elif opt == '-m':
+            min_quality_score = int(re.sub('=','', arg))
         elif opt in ("-t", "--cpus"):
             cpus = int(re.sub('=','', arg))
         elif opt in ("-W", "--overwrite"):
@@ -609,6 +613,7 @@ def main(argv):
             "database file:      " + database_file,
             "output base file:   " + output_base_file,
             "overwrite files:    " + ("no", "yes")[overwrite],
+            "min fastq quality:  " + str(min_quality_score),
             "cpus:               " + str(cpus)])
 
     if cpus < 1:
@@ -624,7 +629,7 @@ def main(argv):
         for fp in sorted(list_seq_file_pairs, key=lambda fp: fp.basefile):
             run_merge_fastq(fp)
             run_usearch(fp, database_file)
-            run_filter(fp)
+            run_filter(fp, min_quality_score)
     else:
         print >>sys.stderr, "[rRNA_pipeline] skipping FASTQ merge/chimera/filtering"
     
