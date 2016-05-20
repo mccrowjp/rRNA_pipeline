@@ -18,6 +18,7 @@ verbose = False
 count_total = 0
 count_short_seqs = 0
 count_long_seqs = 0
+count_non_acgt = 0
 count_chimeras = 0
 count_low_quality = 0
 count_passed = 0
@@ -44,6 +45,7 @@ def filter_line(out_handle, id, seq, qual, min_quality, min_seq_len, max_seq_len
     global count_total
     global count_short_seqs
     global count_long_seqs
+    global count_non_acgt
     global count_chimeras
     global count_low_quality
     global count_passed
@@ -55,6 +57,9 @@ def filter_line(out_handle, id, seq, qual, min_quality, min_seq_len, max_seq_len
         skipline = True
     elif len(seq) > max_seq_len:
         count_long_seqs += 1
+        skipline = True
+    elif re.search('[^acgtACGT]', seq):
+        count_non_acgt += 1
         skipline = True
     elif id in dict_chimera_ids:
         count_chimeras += 1
@@ -195,6 +200,7 @@ def main(argv):
             "seqs total:       " + str(count_total),
             "seqs too short:   " + str(count_short_seqs) + " (" + str(round(100.0*count_short_seqs/count_total, 1)) + "%)",
             "seqs too long:    " + str(count_long_seqs) + " (" + str(round(100.0*count_long_seqs/count_total, 1)) + "%)",
+            "seqs bad chars:   " + str(count_non_acgt) + " (" + str(round(100.0*count_non_acgt/count_total, 1)) + "%)",
             "seqs chimera:     " + str(count_chimeras) + " (" + str(round(100.0*count_chimeras/count_total, 1)) + "%)",
             "seqs low quality: " + str(count_low_quality) + " (" + str(round(100.0*count_low_quality/count_total, 1)) + "%)",
             "seqs passed:      " + str(count_passed) + " (" + str(round(100.0*count_passed/count_total, 1)) + "%)"])

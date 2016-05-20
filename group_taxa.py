@@ -162,8 +162,9 @@ def main(argv):
 
     if verbose:
         print >>sys.stderr, "\n".join([
+            "input taxa groups file: " + taxa_group_file,
             "input taxa counts file: " + swarm_tax_file,
-            "output groups file:     " + output_counts_file])
+            "output groups file:     " + output_groups_file])
 
     read_groups(taxa_group_file)
     read_taxa_counts(swarm_tax_file)
