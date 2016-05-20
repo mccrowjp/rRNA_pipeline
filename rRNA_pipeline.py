@@ -2,7 +2,7 @@
 #
 # rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #
-# Version: 0.2 (5/3/2016)
+# Version: 0.3 (5/19/2016)
 #
 # Original version: 4/11/2016 John P. McCrow (jmccrow [at] jcvi.org)
 # J. Craig Venter Institute (JCVI)
@@ -528,7 +528,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "rRNA_pipeline v0.2 (May 3, 2016)",
+        "rRNA_pipeline v0.3 (May 19, 2016)",
         "Full ssu-rRNA, swarm OTU classification pipeline",
         "",
         "Usage: " + os.path.basename(prog_path) + " (options)",

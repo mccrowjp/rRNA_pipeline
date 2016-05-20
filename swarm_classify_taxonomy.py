@@ -2,7 +2,7 @@
 #
 # swarm_classify_taxonomy - merge best reference taxonomy with sample counts for OTUs
 #
-# Version: 0.2 (5/3/2016)
+# Version: 0.3 (5/19/2016)
 #
 # Part of rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #
@@ -177,7 +177,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "swarm_classify_taxonomy v0.2 (May 3, 2016)",
+        "swarm_classify_taxonomy v0.3 (May 19, 2016)",
         "swarm OTU add taxonomy to counts table",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",

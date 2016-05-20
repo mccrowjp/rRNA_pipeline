@@ -2,7 +2,7 @@
 #
 # purity_plot - classification of reads in swarm OTUs to measure and plot OTU purity
 #
-# Version: 0.2 (5/3/2016)
+# Version: 0.3 (5/19/2016)
 #
 # Part of rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #
@@ -262,7 +262,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "purity_plot v0.2 (May 3, 2016)",
+        "purity_plot v0.3 (May 19, 2016)",
         "swarm OTU purity calculate and plot PDF",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",

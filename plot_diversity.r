@@ -2,7 +2,7 @@
 #
 # plot_diversity - bar plots of OTU richness and alpha-diversity metrics
 #
-# Version: 0.2 (5/3/2016)
+# Version: 0.3 (5/19/2016)
 #
 # Part of rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #

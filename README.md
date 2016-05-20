@@ -25,19 +25,20 @@ Usage
 | plot_heatmap.r | produce sample/OTU heatmap |
 
 ```
-rRNA_pipeline v0.2 (May 3, 2016)
+rRNA_pipeline v0.3 (May 19, 2016)
 Full ssu-rRNA, swarm OTU classification pipeline
 
 Usage: rRNA_pipeline.py (options)
--d name         : database name (16S, V4, V9)
--q dir          : FASTQ folder
--o file         : base filename for results (default: rrna)
--n file         : sample names file (optional)
--p              : skip OTU purity calculation/plots
--t, --cpus int  : number of processes (default: 1)
--W, --overwrite : overwrite files (default: No, run next step)
--h, --help      : help
--v, --verbose   : more information to stderr
+   -d name         : database name (16S, V4, V9)
+   -q dir          : FASTQ folder
+   -o file         : base filename for results (default: rrna)
+   -n file         : sample names file (optional)
+   -p              : skip OTU purity calculation/plots
+   -m int          : minimum quality score for FASTQ (default: 35)
+   -t, --cpus int  : number of processes (default: 1)
+   -W, --overwrite : overwrite files (default: No, run next step)
+   -h, --help      : help
+   -v, --verbose   : more information to stderr
 ```
 
 The rRNA pipeline will skip previous steps if stopped and rerun, unless -W is specified.  To rerun a step, delete the output files created during that step.
