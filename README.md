@@ -29,25 +29,33 @@ rRNA_pipeline v0.3 (May 19, 2016)
 Full ssu-rRNA, swarm OTU classification pipeline
 
 Usage: rRNA_pipeline.py (options)
-   -d name         : database name (16S, V4, V9)
-   -q dir          : FASTQ folder
-   -o file         : base filename for results (default: rrna)
-   -n file         : sample names file (optional)
-   -p              : calculate/plot OTU purity
-   -m int          : minimum quality score for FASTQ (default: 35)
-   -t, --cpus int  : number of processes (default: 1)
-   -W, --overwrite : overwrite files (default: No, run next step)
-   -h, --help      : help
-   -v, --verbose   : more information to stderr
-```
+   -d name          : database name (16S, V4, V9)
+   -q dir           : FASTQ folder
+   -o file          : base filename for results (default: rrna)
+   -n file          : sample names file (optional)
+   -p               : calculate/plot OTU purity
+   -m int           : minimum quality score for FASTQ (default: 35)
+   -s, --steps list : run only the steps in list (default: All)
+   -t, --cpus int   : number of processes (default: 1)
+   -w               : no overwrite of files, skip completed steps (default)
+   -W, --overwrite  : overwrite files (default if -s)
+   -h, --help       : help
+   -v, --verbose    : more information to stderr
 
-The rRNA pipeline will skip previous steps if stopped and rerun, unless -W is specified.  To rerun a step, delete the output files created during that step.
+   If -s is used, then -W overwrite is the default
+   Steps list can include any of the following: 
+      All, merge_fastq, chimera, filter_fasta, derep
+      swarm, classify, plots, purity, split_plastid
+      plastid_classify, plastid_plots, plastid_purity
+
+Example: rRNA_pipeline.py -d 16S -q ./fastq
+```
 
 If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.
 
 **Basic operation for 16S:**
 ```bash
-rRNA_pipeline.py -d 16S
+rRNA_pipeline.py -d 16S -q ./fastq
 ```
 
 To replace FASTQ filenames with sample names in all output, use -n to specify tab-delimited file (sample_name, FASTQ base name).  FASTQ base names may be followed by any of [_R1, _R2, .filtered, .fastq, .fq] in the full FASTQ file name.  
@@ -57,6 +65,13 @@ The basic pipeline runs relatively quickly, however the extra calculation of OTU
 **Use the following for 18S V4, with sample names, run on 4 CPUs, with purity plot:**
 ```bash
 rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4 -p
+```
+
+The rRNA pipeline will skip previous steps if stopped and rerun, unless -W is specified.  To rerun starting at a particular step, delete the output files created during that step, and run again.  To run only specific steps, use -s and specify steps by name.  Spaces are not allowed unless the list is bound by quotes.  If -s is used then -W is the default and files will be overwritten unless -w is given.
+
+**Use the following for 18S V9, running only derep, swarm, and classify steps:**
+```bash
+rRNA_pipeline.py -d V9 -s "derep,swarm,classify"
 ```
 
 *Output files, created in the following order:*
