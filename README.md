@@ -25,7 +25,7 @@ Usage
 | plot_heatmap.r | produce sample/OTU heatmap |
 
 ```
-rRNA_pipeline v0.3 (May 19, 2016)
+rRNA_pipeline v0.4 (May 21, 2016)
 Full ssu-rRNA, swarm OTU classification pipeline
 
 Usage: rRNA_pipeline.py (options)

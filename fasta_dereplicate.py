@@ -2,7 +2,7 @@
 #
 # fasta_dereplicate - Unique FASTA sequences (100% identity) in swarm or besthit formats
 #
-# Version: 0.3 (5/19/2016)
+# Version: 0.4 (5/21/2016)
 #
 # Part of rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #
@@ -202,7 +202,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "fasta_dereplicate v0.3 (May 19, 2016)",
+        "fasta_dereplicate v0.4 (May 21, 2016)",
         "Dereplicate FASTA",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options) [FASTA file(s)...]",

@@ -2,7 +2,7 @@
 #
 # group_taxa - merge sample counts by taxonomic group
 #
-# Version: 0.3 (5/19/2016)
+# Version: 0.4 (5/21/2016)
 #
 # Part of rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #
@@ -119,7 +119,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "group_taxa v0.3 (May 19, 2016)",
+        "group_taxa v0.4 (May 21, 2016)",
         "merge OTU counts by taxonomic groups",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",

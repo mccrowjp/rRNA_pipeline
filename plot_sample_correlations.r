@@ -2,7 +2,7 @@
 #
 # plot_sample_correlations - plot hierarchical tree of sample correlations 
 #
-# Version: 0.3 (5/19/2016)
+# Version: 0.4 (5/21/2016)
 #
 # Part of rRNA_pipeline - FASTQ filtering, and swarm OTU classification of 16/18S barcodes
 #
