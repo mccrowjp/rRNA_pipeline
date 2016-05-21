@@ -536,7 +536,7 @@ def main(argv):
         "   -q dir          : FASTQ folder",
         "   -o file         : base filename for results (default: rrna)",
         "   -n file         : sample names file (optional)",
-        "   -p              : skip OTU purity calculation/plots",
+        "   -p              : calculate/plot OTU purity",
         "   -m int          : minimum quality score for FASTQ (default: 35)",
         "   -t, --cpus int  : number of processes (default: 1)",
         "   -W, --overwrite : overwrite files (default: No, run next step)",
@@ -550,7 +550,7 @@ def main(argv):
     database_file = ""
     fastq_dir = ""
     sample_names_file = ""
-    skip_purity = False
+    calc_purity = False
     output_base_file = "rrna"
     min_quality_score = 35
     
@@ -576,7 +576,7 @@ def main(argv):
         elif opt == '-n':
             sample_names_file = arg
         elif opt == '-p':
-            skip_purity = True
+            calc_purity = True
         elif opt == '-m':
             min_quality_score = int(re.sub('=','', arg))
         elif opt in ("-t", "--cpus"):
@@ -641,11 +641,11 @@ def main(argv):
     if database_name == '16S':
         run_classify_chloro(output_base_file, dict_database_path['chloro'])
         run_plots(output_base_file + ".plastid", 'chloro')
-        if not skip_purity:
+        if calc_purity:
             run_purity(output_base_file + ".plastid", dict_database_path['chloro'])
 
     run_plots(output_base_file, database_name)
-    if not skip_purity:
+    if calc_purity:
         run_purity(output_base_file, database_file)
 
 

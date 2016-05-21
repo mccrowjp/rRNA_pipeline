@@ -33,7 +33,7 @@ plot_taxa_groups = function(x, fontsize=1, min.taxa.frac=0, title="", ...) {
     par(mar=c(12,5,5,2))
     h = rmean[rmean >= min.taxa.frac]
     lab = x[rmean >= min.taxa.frac,1]
-    se = (rsd)[rmean >= min.taxa.frac]
+    se = (rsd/sqrt(nrow(xmat)))[rmean >= min.taxa.frac]
     maxh = max(h+se)
     bp = barplot(h, names.arg=lab, ylim=c(0,maxh), las=2, cex.axis=0.8, cex.names=0.8*fontsize, space=0, ylab="Fraction", main=title)
     arrows(bp, h+se, bp, h-se, angle=90, code=1, length=0)

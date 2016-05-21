@@ -33,7 +33,7 @@ Usage: rRNA_pipeline.py (options)
    -q dir          : FASTQ folder
    -o file         : base filename for results (default: rrna)
    -n file         : sample names file (optional)
-   -p              : skip OTU purity calculation/plots
+   -p              : calculate/plot OTU purity
    -m int          : minimum quality score for FASTQ (default: 35)
    -t, --cpus int  : number of processes (default: 1)
    -W, --overwrite : overwrite files (default: No, run next step)
@@ -52,9 +52,9 @@ rRNA_pipeline.py -d 16S
 
 To replace FASTQ filenames with sample names in all output, use -n to specify tab-delimited file (sample_name, FASTQ base name).  FASTQ base names may be followed by any of [_R1, _R2, .filtered, .fastq, .fq] in the full FASTQ file name.  
 
-The basic pipeline runs relatively quickly, however the extra calculation of OTU purity takes much longer.  Use -p to skip the purity calculation.
+The basic pipeline runs relatively quickly, however the extra calculation of OTU purity takes much longer.  Use -p to calculate and plot purity.
 
-**Use the following for 18S V4, with sample names, run on 4 CPUs, no purity plot:**
+**Use the following for 18S V4, with sample names, run on 4 CPUs, with purity plot:**
 ```bash
 rRNA_pipeline.py -d V4 -o rrna -n sample_names.txt -t 4 -p
 ```

@@ -42,7 +42,7 @@ def read_swarms(swarm_file):
             dict_id_swarm[id] = id_list[0]
     in_handle.close()
 
-def read_swarm_counts(swarm_counts_file, min_swarm_count):
+def read_swarm_counts(swarm_counts_file, min_swarm_count, top_swarms):
     dict_swarm_counts = {}
     global dict_derep_ids
 
@@ -67,12 +67,23 @@ def read_swarm_counts(swarm_counts_file, min_swarm_count):
 
     in_handle.close()
 
+    num_ids = 0
+    dict_top_swarms = {}
+    for swarm_id in sorted(dict_swarm_counts, key=dict_swarm_counts.get, reverse=True):
+        if num_ids < top_swarms:
+            dict_top_swarms[swarm_id] = 1
+            num_ids += 1
+
     for id in dict_id_swarm:
         swarm_id = dict_id_swarm[id]
-        if dict_swarm_counts.get(swarm_id, 0) >= min_swarm_count:
+        if swarm_id in dict_top_swarms and dict_swarm_counts.get(swarm_id, 0) >= min_swarm_count:
             dict_derep_ids[id] = 1
 
+    if verbose:
+        print >>sys.stderr, "Top purity content, swarms: " + str(len(dict_top_swarms)) + " derep ids: " + str(len(dict_derep_ids))
+
 def write_swarm_content(fasta_file, swarm_content_fasta_file):
+    swarm_content_size = 0
     in_handle = happyfile.hopen_or_else(fasta_file)
         
     if verbose:
@@ -94,6 +105,7 @@ def write_swarm_content(fasta_file, swarm_content_fasta_file):
             id = re.split('\s', line[1:])[0]
             if id in dict_derep_ids:
                 write_out = True
+                swarm_content_size += 1
             else:
                 write_out = False
 
@@ -102,6 +114,8 @@ def write_swarm_content(fasta_file, swarm_content_fasta_file):
     
     in_handle.close()
     out_handle.close()
+
+    return swarm_content_size
 
 def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database_file, cpus):
     global dict_id_best_hit
@@ -270,7 +284,8 @@ def main(argv):
         "   -s file        : swarm file",
         "   -c file        : swarm counts file",
         "   -d file        : database FASTA file",
-        "   -m int         : minimum swarm OTU count (default: 100)",
+        "   -m int         : minimum swarm OTU count (default: 0)",
+        "   -n int         : top swarm OTUs (default: 100)",
         "   -o file        : output base filename",
         "   -t, --cpus int : number of processes to run ggsearch (default: 1)",
         "   -h, --help     : help",
@@ -284,14 +299,15 @@ def main(argv):
     swarm_content_fasta_file = ""
     swarm_content_ggsearch_file = ""
     database_file = ""
-    min_swarm_count = 100
+    min_swarm_count = 0
+    top_swarms = 100
     output_swarm_content_tax_file = ""
     output_swarm_purity_file = ""
     output_purity_pdf = ""
     cpus = 1
     
     try:
-        opts, args = getopt.getopt(argv[1:], "f:s:c:d:m:o:t:hv", ["cpus=", "help", "verbose", "test"])
+        opts, args = getopt.getopt(argv[1:], "f:s:c:d:m:n:o:t:hv", ["cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
         print >>sys.stderr, help
         sys.exit(2)
@@ -313,6 +329,8 @@ def main(argv):
             database_file = arg
         elif opt == '-m':
             min_swarm_count = int(re.sub('=','', arg))
+        elif opt == '-n':
+            top_swarms = int(re.sub('=','', arg))
         elif opt == '-o':
             base_file = arg
         elif opt in ("-t", "--cpus"):
@@ -336,6 +354,7 @@ def main(argv):
             "input swarm file:           " + swarm_file,
             "input database file:        " + database_file,
             "minimum swarm count:        " + str(min_swarm_count),
+            "top swarm count:            " + str(top_swarms),
             "swarm content fasta file:   " + swarm_content_fasta_file,
             "ggsearch file:              " + swarm_content_ggsearch_file,
             "content taxonomy file:      " + output_swarm_content_tax_file,
@@ -344,10 +363,12 @@ def main(argv):
             "cpus:                       " + str(cpus)])
 
     read_swarms(swarm_file)
-    read_swarm_counts(swarm_counts_file, min_swarm_count)
-    write_swarm_content(fasta_file, swarm_content_fasta_file)
-    get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database_file, cpus)
-    write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output_purity_pdf)
+    read_swarm_counts(swarm_counts_file, min_swarm_count, top_swarms)
+    if write_swarm_content(fasta_file, swarm_content_fasta_file):
+        get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database_file, cpus)
+        write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output_purity_pdf)
+    else:
+        print >>sys.stderr, "[purity_plot] skipping purity: no content above threshold"
 
 if __name__ == "__main__":
     main(sys.argv)
