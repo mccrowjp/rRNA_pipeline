@@ -610,6 +610,8 @@ def main(argv):
 
     for s in re.split('[^\w_]+', run_steps_str.lower()):
         dict_steps[s] = 1
+        if s in ('purity', 'plastid_purity'):
+            calc_purity = True
         if s == 'all':
             run_all_steps = True
 
