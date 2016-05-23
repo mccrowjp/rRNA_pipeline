@@ -17,6 +17,8 @@ intitle = paste("", args[3], sep="")
 
 plot_sample_corr = function(x, fontsize=1, title="", ...) {
     xmat = as.matrix(x[,-(1:3)])
+    cmax = apply(xmat, 2, max)
+    xmat = xmat[,cmax > 0]
     xmat.h = hclust(as.dist(2-cor(sqrt(xmat))))
     plot(xmat.h, cex=0.7*fontsize, xlab="Sample", ylab="Correlation sqrt(reads)", sub="", main=title)
 }

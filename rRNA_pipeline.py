@@ -562,6 +562,7 @@ def main(argv):
     output_base_file = "rrna"
     min_quality_score = 35
     run_all_steps = True
+    request_no_overwrite = False
     run_steps_str = ""
     dict_steps = {}
     
@@ -593,12 +594,15 @@ def main(argv):
         elif opt in ("-s", "--steps"):
             run_steps_str = arg
             run_all_steps = False
+            if not request_no_overwrite:
+                overwrite = True
         elif opt in ("-t", "--cpus"):
             cpus = int(re.sub('=','', arg))
         elif opt in ("-W", "--overwrite"):
             overwrite = True
         elif opt == '-w':
             overwrite = False
+            request_no_overwrite = True
         elif opt in ("-v", "--verbose"):
             verbose = True
 
