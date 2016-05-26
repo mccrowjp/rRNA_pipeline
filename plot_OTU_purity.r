@@ -29,17 +29,20 @@ plotxy_marginhists = function(x, y, margins=c(5,5), border=1, h.axis=TRUE, h1.ax
     x = df[,1]
     y = df[,2]
     
-    hx = hist(x, plot=F, breaks=h1.b)
-    hy = hist(y, plot=F, breaks=h2.b)
-    if(grepl("x", log)) { hx = hist(log(x,10), plot=F, breaks=h1.b) }
-    if(grepl("y", log)) { hy = hist(log(y,10), plot=F, breaks=h2.b) }
+    h1.at = seq(0, max(x), length=h1.b)
+    h2.at = seq(0, max(y), length=h2.b)
+    
+    hx = hist(x, plot=F, breaks=h1.at)
+    hy = hist(y, plot=F, breaks=h2.at)
+    if(grepl("x", log)) { h1.at = seq(0, max(log(x,10)), length=h1.b); hx = hist(log(x,10), plot=F, breaks=h1.b) }
+    if(grepl("y", log)) { h2.at = seq(0, max(log(y,10)), length=h2.b); hy = hist(log(y,10), plot=F, breaks=h2.b) }
     
     par(mar=c(0,margins[2],1,1))
-    barplot(hx$counts, axes=F, ylim=c(0, max(hx$counts)), space=0, col=h1.col, border=border)
+    barplot(hx$counts, axes=T, ylim=c(0, max(hx$counts)), space=0, col=h1.col, border=border)
     if(h1.axis) { axis(2) }
     
     par(mar=c(margins[1],0,1,1))
-    barplot(hy$counts, axes=F, xlim=c(0, max(hy$counts)), space=0, col=h2.col, border=border, horiz=TRUE)
+    barplot(hy$counts, axes=T, xlim=c(0, max(hy$counts)), space=0, col=h2.col, border=border, horiz=TRUE)
     if(h2.axis) { axis(1) }
     
     par(mar=c(margins[1],margins[2],1,1))
