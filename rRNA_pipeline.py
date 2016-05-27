@@ -105,7 +105,7 @@ def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
 
 def run_merge_fastq(fp):
     if fp.ispaired:
-        cmd_params = " ".join(["-t 50 --threads", str(cpus), "-f", fp.fastq1, "-r", fp.fastq2, "-o", fp.basefile])
+        cmd_params = " ".join(["-q 25 -t 50 --threads", str(cpus), "-f", fp.fastq1, "-r", fp.fastq2, "-o", fp.basefile])
         
         run_command('pear', fp.pear, "pear", cmd_params, True)
 
