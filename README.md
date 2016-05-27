@@ -34,7 +34,7 @@ Usage: rRNA_pipeline.py (options)
    -o file          : base filename for results (default: rrna)
    -n file          : sample names file (optional)
    -p               : calculate/plot OTU purity
-   -m int           : minimum quality score for FASTQ (default: 35)
+   -m int           : minimum quality score for FASTQ (default: 30)
    -s, --steps list : run only the steps in list (default: All)
    -t, --cpus int   : number of processes (default: 1)
    -w               : no overwrite of files, skip completed steps (default)

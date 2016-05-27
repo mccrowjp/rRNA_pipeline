@@ -105,7 +105,7 @@ def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
 
 def run_merge_fastq(fp):
     if fp.ispaired:
-        cmd_params = " ".join(["-q 35 -t 50 --threads", str(cpus), "-f", fp.fastq1, "-r", fp.fastq2, "-o", fp.basefile])
+        cmd_params = " ".join(["-t 50 --threads", str(cpus), "-f", fp.fastq1, "-r", fp.fastq2, "-o", fp.basefile])
         
         run_command('pear', fp.pear, "pear", cmd_params, True)
 
@@ -535,7 +535,7 @@ def main(argv):
         "   -o file          : base filename for results (default: rrna)",
         "   -n file          : sample names file (optional)",
         "   -p               : calculate/plot OTU purity",
-        "   -m int           : minimum quality score for FASTQ (default: 35)",
+        "   -m int           : minimum quality score for FASTQ (default: 30)",
         "   -s, --steps list : run only the steps in list (default: All)",
         "   -t, --cpus int   : number of processes (default: 1)",
         "   -w               : no overwrite of files, skip completed steps (default)" ,
@@ -560,7 +560,7 @@ def main(argv):
     sample_names_file = ""
     calc_purity = False
     output_base_file = "rrna"
-    min_quality_score = 35
+    min_quality_score = 30
     run_all_steps = True
     request_no_overwrite = False
     run_steps_str = ""
