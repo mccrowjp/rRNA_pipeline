@@ -59,7 +59,7 @@ def calc_swarm_counts():
     for id in dict_id_swarm:
         swarm_id = dict_id_swarm[id]
         for i in range(len(sample_list)):
-            dict_swarm_sample_counts[swarm_id, i] = dict_swarm_sample_counts.get(swarm_id, 0) + dict_id_sample_counts.get((id, i),0)
+            dict_swarm_sample_counts[swarm_id, i] = dict_swarm_sample_counts.get((swarm_id, i), 0) + dict_id_sample_counts.get((id, i),0)
             dict_swarm_counts[swarm_id] = dict_swarm_counts.get(swarm_id, 0) + dict_id_sample_counts.get((id, i),0)
 
     for swarm_id in dict_swarm_counts:
