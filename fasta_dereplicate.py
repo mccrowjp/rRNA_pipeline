@@ -17,6 +17,7 @@ import sha
 
 verbose = False
 
+dict_all_sample_names = {}
 dict_sample_name = {}
 dict_id_file_counts = {}
 dict_id_counts = {}
@@ -44,7 +45,12 @@ def read_sample_names(sample_names_file):
             line = line.rstrip()
             
             name, file = line.split("\t")
+            if name in dict_all_sample_names:
+                print >>sys.stderr, "Duplicate sample name found: " + name
+                sys.exit(2)
+            
             dict_sample_name[file] = name
+            dict_all_sample_names[name] = 1
     
             m = re.search('^(.+)\.filtered\.fa$', file)
             if m:
