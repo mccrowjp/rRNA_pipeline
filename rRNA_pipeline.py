@@ -37,7 +37,7 @@ class SequenceFilePair:
     def __init__(self, file1, file2, ispaired):
         b = os.path.basename(file1)
         if ispaired:
-            m = re.match('(.+)_R[12](_filtered)*\.f\w+$', b)
+            m = re.match('(.+)_R[12].*\.f\w+$', b)
             if m:
                 b = m.group(1)
         else:
