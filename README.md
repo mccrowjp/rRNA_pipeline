@@ -29,7 +29,7 @@ rRNA_pipeline v0.4 (May 21, 2016)
 Full ssu-rRNA, swarm OTU classification pipeline
 
 Usage: rRNA_pipeline.py (options)
-   -d name          : database name (16S, V4, V9)
+   -d name          : database name (16S, 18S, V4, V9)
    -q dir           : FASTQ folder
    -o file          : base filename for results (default: rrna)
    -n file          : sample names file (optional)
@@ -51,7 +51,7 @@ Usage: rRNA_pipeline.py (options)
 Example: rRNA_pipeline.py -d 16S -q ./fastq
 ```
 
-If using alternate databases for 16S, Plastid, 18S_V4, or 18S_V9, specify paths in init.txt.
+If using alternate databases for 16S, Plastid, 18S, 18S_V4, or 18S_V9, specify paths in init.txt.
 
 **Basic operation for 16S:**
 ```bash
@@ -112,9 +112,10 @@ Installation
 ------------
 
 1. Make sure all dependencies are installed (see below), and make them accessible to your path.
-2. Databases derived from PR2 with updated taxonomy are included in db/.  Use gunzip to uncompress these files.
-3. Download SILVA NR database (http://www.arb-silva.de/), and add to db/ if you want to use 16S
-4. Test the rRNA pipeline:
+2. Databases for 18S V4/V9 derived from PR2 with updated taxonomy are included in db/.  Use gunzip to uncompress these files.
+3. Download the full PR2 database (http://ssu-rrna.org/), and add to db/ if you want to use other regions of 18S
+4. Download SILVA NR database (http://www.arb-silva.de/), and add to db/ if you want to use 16S
+5. Test the rRNA pipeline:
 
 ```bash
 rRNA_pipeline.py --test
