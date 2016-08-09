@@ -18,7 +18,7 @@ prog_dir = os.path.dirname(prog_path)
 db_dir = os.path.join(prog_dir, 'db')
 taxa_groups_file = os.path.join(prog_dir, 'taxa_groups.txt')
 
-dict_database_path = {'16S' : os.path.join(db_dir,'db_16S.fa'), 'V4' : os.path.join(db_dir,'db_V4.fa'), 'V9' : os.path.join(db_dir,'db_V9.fa'), 'chloro' : os.path.join(db_dir,'db_plastid.fa')}
+dict_database_path = {'16S' : os.path.join(db_dir,'db_16S.fa'), '18S' : os.path.join(db_dir,'db_18S.fa'), 'V4' : os.path.join(db_dir,'db_V4.fa'), 'V9' : os.path.join(db_dir,'db_V9.fa'), 'chloro' : os.path.join(db_dir,'db_plastid.fa')}
 
 list_seq_file_pairs = []
 cpus = 1
@@ -401,7 +401,7 @@ def run_plot_heatmap(output_base_file):
     run_command('plot_heatmap', outfile, os.path.join(prog_dir, "plot_heatmap.r"), cmd_params, True)
 
 def run_plots(output_base_file, database_name):
-    dict_title = {'16S' : '16S', 'V4' : '18S_V4', 'V9' : '18S_V9', 'chloro' : 'Plastid'}
+    dict_title = {'16S' : '16S', '18S' : '18S', 'V4' : '18S_V4', 'V9' : '18S_V9', 'chloro' : 'Plastid'}
     title = dict_title.get(database_name, "")
 
     run_plot_sample_correlations(output_base_file, title)
@@ -426,7 +426,7 @@ def init():
             if m:
                 key, value = m.group(1), m.group(2)
                 db = re.sub('^db_', '', key)
-                if db in ('16S', 'V4', 'V9', 'chloro'):
+                if db in ('16S', '18S', 'V4', 'V9', 'chloro'):
                     path = value
                     if not os.path.exists(path):
                         if os.path.exists(os.path.join(db_dir, path)):
@@ -474,7 +474,7 @@ def test_databases():
         init()
     except Exception:
         failed = 1
-    for db in ('16S', 'V4', 'V9', 'chloro'):
+    for db in ('16S', '18S', 'V4', 'V9', 'chloro'):
         if os.path.exists(dict_database_path.get(db, "")):
             print >>sys.stderr, "[rRNA_pipeline] test_databases: " + db + " found"
         else:
@@ -530,7 +530,7 @@ def main(argv):
         "Full ssu-rRNA, swarm OTU classification pipeline",
         "",
         "Usage: " + os.path.basename(prog_path) + " (options)",
-        "   -d name          : database name (16S, V4, V9)",
+        "   -d name          : database name (16S, 18S, V4, V9)",
         "   -q dir           : FASTQ folder",
         "   -o file          : base filename for results (default: rrna)",
         "   -n file          : sample names file (optional)",
@@ -626,10 +626,10 @@ def main(argv):
 
     init()
 
-    if database_name in ('16S', 'V4', 'V9'):
+    if database_name in ('16S', '18S', 'V4', 'V9'):
         database_file = dict_database_path[database_name]
     else:
-        print >>sys.stderr, help + "\nDatabase name must be one of: 16S, V4, V9"
+        print >>sys.stderr, help + "\nDatabase name must be one of: 16S, 18S, V4, V9"
         sys.exit(2)
 
     if verbose:

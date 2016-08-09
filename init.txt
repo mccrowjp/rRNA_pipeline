@@ -1,5 +1,6 @@
 db_V9: db/db_V9.fa
 db_V4: db/db_V4.fa
 db_16S: db/db_16S.fa
+db_18S: db/db_18S.fa
 db_chloro: db/db_plastid.fa
 taxa_groups: taxa_groups.txt
