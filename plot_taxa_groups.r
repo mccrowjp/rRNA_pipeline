@@ -47,7 +47,7 @@ if(intable == 'NA' || outpdf == 'NA') {
     "Usage: [input group counts table] [output pdf]"
 } else {
     if(intitle == 'NA') { intitle = "" }
-    dat = read.table(intable, sep="\t", header=T, comment="")
+    dat = read.table(intable, sep="\t", header=T, , comment='', quote='')
     pdf(outpdf)
     plot_taxa_groups(dat, title=intitle)
     plot_heatmap(dat, min.taxa.frac=0.005)

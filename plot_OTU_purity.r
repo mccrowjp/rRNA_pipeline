@@ -53,7 +53,7 @@ if(intable == 'NA' || outpdf == 'NA') {
     "Usage: [input purity table] [output pdf] ([title])"
 } else {
     if(intitle == 'NA') { intitle = "" }
-    dat = read.table(intable, sep="\t", header=T, comment="")
+    dat = read.table(intable, sep="\t", header=T, , comment='', quote='')
     if(nrow(dat) > 0) {
         pdf(outpdf)
             plotxy_marginhists(dat[,3], dat[,5]*100, log="x", pch=20, col=4, ylim=c(0, 100), xlab="OTU reads", ylab="OTU purity (%)", title=intitle, h2.b=100, h1.b=50)

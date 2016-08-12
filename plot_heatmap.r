@@ -26,7 +26,7 @@ plot_heatmap = function(x, fontsize=1, ...) {
 if(intable == 'NA' || outpdf == 'NA') {
     "Usage: [input OTU taxonomy counts table] [output pdf]"
 } else {
-    dat = read.table(intable, sep="\t", header=T, comment="")
+    dat = read.table(intable, sep="\t", header=T, , comment='', quote='')
     pdf(outpdf)
     plot_heatmap(dat)
     dev.off()
