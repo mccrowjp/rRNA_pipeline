@@ -121,6 +121,17 @@ Installation
 rRNA_pipeline.py --test
 ```
 
+Uncompressing the db/ files and running the test can also be accomplished with make
+```bash
+make
+```
+
+**Python 3**
+If you have Python 3 installed, use the files in source_py3 instead. These can be copied by:
+```bash
+make python3
+```
+
 Dependencies
 ------------
 
