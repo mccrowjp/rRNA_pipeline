@@ -122,7 +122,9 @@ def run_filter(fp, min_quality_score):
 def run_dereplicate(output_base_file, sample_names_file):
     derep_fa = output_base_file + ".derep.fa"
     derep_counts = output_base_file + ".derep.counts"
-    cmd_params = "-l 2 -t 3 -o " + derep_fa + " -c " + derep_counts
+    cmd_params = "-o " + derep_fa + " -c " + derep_counts + " -t 3"
+    if len(list_seq_file_pairs) > 1:
+        cmd_params += " -l 2"
     if sample_names_file:
         cmd_params += " -n " + sample_names_file
     for fp in list_seq_file_pairs:
