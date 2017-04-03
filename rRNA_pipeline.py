@@ -25,6 +25,11 @@ cpus = 1
 verbose = False
 overwrite = False
 
+def xstr(s):
+    if s is None:
+        return ''
+    return str(s)
+
 class SequenceFilePair:
     fastq1 = ""
     fastq2 = ""
@@ -68,10 +73,10 @@ def get_seq_file_pairs(fastq_dir):
     
     for file in os.listdir(fastq_dir):
         f1 = os.path.join(fastq_dir, file)
-        m1 = re.search('^(.+)_R([12])(.+)*\.(fastq|fq)$', file)
+        m1 = re.search('^(.+)_R([12])(.*)\.(fastq|fq)$', file)
         if m1:
             if m1.group(2) == '1':
-                f2 = os.path.join(fastq_dir, m1.group(1) + "_R2" + str(m1.group(3)) + "." + m1.group(4))
+                f2 = os.path.join(fastq_dir, m1.group(1) + "_R2" + xstr(m1.group(3)) + "." + m1.group(4))
                 if os.path.exists(f2):
                     list_seq_file_pairs.append(SequenceFilePair(f1, f2, True))
                 else:
