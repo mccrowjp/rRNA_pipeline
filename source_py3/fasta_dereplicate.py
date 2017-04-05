@@ -13,7 +13,7 @@
 import sys, re, os, getopt
 import gzip, bz2
 import happyfile
-import sha
+import hashlib
 
 verbose = False
 
@@ -67,8 +67,7 @@ def derep_line(id, seq, filenum):
     
     if seq:
         seq = seq.lower()
-        sha_obj = sha.new(seq)
-        key = sha_obj.hexdigest()
+        key = hashlib.sha1(seq).hexdigest()
         dict_id_counts[key] = dict_id_counts.get(key,0) + 1
         dict_id_file_counts[key, filenum] = dict_id_file_counts.get((key, filenum), 0) + 1
         dict_id_seq[key] = seq
