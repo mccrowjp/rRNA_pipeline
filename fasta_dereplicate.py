@@ -67,7 +67,7 @@ def derep_line(id, seq, filenum):
     
     if seq:
         seq = seq.lower()
-        key = hashlib.sha1(seq).hexdigest()
+        key = hashlib.sha1(seq.encode()).hexdigest()
         dict_id_counts[key] = dict_id_counts.get(key,0) + 1
         dict_id_file_counts[key, filenum] = dict_id_file_counts.get((key, filenum), 0) + 1
         dict_id_seq[key] = seq
