@@ -3,14 +3,13 @@
 ## happyfile - File open read/write functions, with automatic support for Gzip or BZip2 compression
 ## Created by: John McCrow (Feb. 25, 2016)
 #
-# 1. Basic hopen and hopen_write do not complain by way of IOError exceptions.
+# 1. Basic hopen and hopen_write are happy, and thus do not complain by way of IOError exceptions.
 #    Instead they return None, in case of file not found or permission issues.
 #    Otherwise they return a valid file handle.
-#    (Not standard python practice, but happier!)
 #
 # 2. _any functions will attempt to open a base filename with added extensions of any compression method
 #
-# 3. _or_else functions will report a to stderr upon failure to open, and exit, rather than raise exception
+# 3. _or_else functions will report a nice message to stderr upon failure to open, rather than raise exception
 #
 # 4. _write functions open file handles for writing, and can write compressed files directly
 #
@@ -24,13 +23,16 @@ class hCompression:
     bzip2 = 2
     bz2 = 2
 
+def xprint(s):
+    sys.stderr.write(str(s) + '\n')
+        
 def hopen(infile):
     f = None
     try:
         if re.search('\.bz2$', infile):
-            f = bz2.BZ2File(infile, 'r')
+            f = bz2.open(infile, 'rt')
         elif re.search('\.gz$', infile):
-            f = gzip.GzipFile(infile, 'r')
+            f = gzip.open(infile, 'rt')
         else:
             f = open(infile)
     except IOError:
@@ -49,7 +51,7 @@ def hopen_or_else(infile):
     if f:
         return f
     else:
-        print >>sys.stderr, "Unable to open file: " + infile
+        xprint("Unable to open file: " + infile)
         sys.exit(2)
 
 def hopen_or_else_any(basefile):
@@ -57,7 +59,7 @@ def hopen_or_else_any(basefile):
     if f:
         return f
     else:
-        print >>sys.stderr, "Unable to open file: " + basefile
+        xprint("Unable to open file: " + basefile)
         sys.exit(2)
 
 def hopen_write(outfile, compression=hCompression.none, level=9):
@@ -84,5 +86,5 @@ def hopen_write_or_else(outfile, compression=hCompression.none, level=9):
     if f:
         return f
     else:
-        print >>sys.stderr, "Unable to write to file: " + outfile
+        xprint("Unable to write to file: " + outfile)
         sys.exit(2)
