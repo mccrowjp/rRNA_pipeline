@@ -126,6 +126,11 @@ Uncompressing the db/ files and running the test can also be accomplished with m
 make
 ```
 
+If you are having trouble with usearch or want to skip the chimera checking for any reason, then edit the init.txt file to turn it off:
+```
+chimera: off
+```
+
 **Python 3**
 If you have Python 3 installed, use the files in source_py3 instead. These can be copied by:
 ```bash
@@ -138,6 +143,6 @@ Dependencies
 * Python 2.7 (https://www.python.org/downloads/)
 * R (https://cran.r-project.org/)
 * PEAR (https://github.com/xflouris/PEAR.git)
-* USEARCH (http://www.drive5.com/usearch/download.html)
+* USEARCH v8.0 (http://www.drive5.com/usearch/download.html)
 * SWARM (https://github.com/torognes/swarm)
 * FASTA36 (https://github.com/wrpearson/fasta36)

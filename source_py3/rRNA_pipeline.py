@@ -24,6 +24,7 @@ list_seq_file_pairs = []
 cpus = 1
 verbose = False
 overwrite = False
+do_chimera_search = True
 
 def xstr(s):
     if s is None:
@@ -115,8 +116,13 @@ def run_merge_fastq(fp):
         run_command('pear', fp.pear, "pear", cmd_params, True)
 
 def run_usearch(fp, database_file):
+    global do_chimera_search
     cmd_params = " ".join(["-threads", str(cpus), "-uchime_ref", fp.pear, "-db", database_file, "-uchimeout", fp.chimera, "-strand plus"])
-    
+
+    if not do_chimera_search:
+        # create empty file, so that step will be skipped, but reported
+        open(fp.chimera, 'a').close()
+
     run_command('chimera', fp.chimera, "usearch", cmd_params, True)
 
 def run_filter(fp, min_quality_score):
@@ -419,6 +425,7 @@ def run_plots(output_base_file, database_name):
 def init():
     global dict_database_path
     global taxa_groups_file
+    global do_chimera_search
     init_file = os.path.join(prog_dir, 'init.txt')
 
     in_handle = happyfile.hopen(init_file)
@@ -447,6 +454,9 @@ def init():
                         taxa_groups_file = value
                     else:
                         taxa_groups_file = os.path.join(prog_dir, value)
+                if key == 'chimera':
+                    if re.match('^(off|no)', value.lower()):
+                        do_chimera_search = False
     
         in_handle.close()
 
@@ -561,6 +571,7 @@ def main(argv):
     global verbose
     global overwrite
     global cpus
+    global do_chimera_search
     database_name = ""
     database_file = ""
     fastq_dir = ""
@@ -647,6 +658,7 @@ def main(argv):
             "database file:      " + database_file,
             "output base file:   " + output_base_file,
             "overwrite files:    " + ("no", "yes")[overwrite],
+            "chimera search:     " + ("no", "yes")[do_chimera_search],
             "min fastq quality:  " + str(min_quality_score),
             "cpus:               " + str(cpus)]), file=sys.stderr)
 

@@ -4,3 +4,4 @@ db_16S: db/db_16S.fa
 db_18S: db/db_18S.fa
 db_chloro: db/db_plastid.fa
 taxa_groups: taxa_groups.txt
+chimera: yes
