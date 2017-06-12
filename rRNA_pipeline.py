@@ -88,6 +88,16 @@ def get_seq_file_pairs(fastq_dir):
             if m2:
                 list_seq_file_pairs.append(SequenceFilePair(f1, '', False))
 
+def is_fasta(fasta_file):
+    in_handle = happyfile.hopen(fasta_file)
+    retval = False
+    if in_handle:
+        line = in_handle.readline()
+        if line and re.match('^>', line):
+            retval = True
+        in_handle.close()
+    return retval
+
 def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
     if overwrite or not os.path.exists(checkfile):
         print >>sys.stderr, "[rRNA_pipeline] running " + name + " " + checkfile
@@ -119,7 +129,7 @@ def run_usearch(fp, database_file):
     global do_chimera_search
     cmd_params = " ".join(["-threads", str(cpus), "-uchime_ref", fp.pear, "-db", database_file, "-uchimeout", fp.chimera, "-strand plus"])
 
-    if not do_chimera_search:
+    if not (do_chimera_search and is_fasta(fp.pear)):
         # create empty file, so that step will be skipped, but reported
         open(fp.chimera, 'a').close()
 
