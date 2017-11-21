@@ -29,6 +29,9 @@ class Format:
     swarm = 1
     bestid = 2
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def read_sample_names(sample_names_file):
     global dict_sample_name
     
@@ -36,7 +39,7 @@ def read_sample_names(sample_names_file):
         in_handle = happyfile.hopen_or_else(sample_names_file)
     
         if verbose:
-            print >>sys.stderr, "Reading sample names file: " + sample_names_file
+            xprint("Reading sample names file: " + sample_names_file)
         
         while 1:
             line = in_handle.readline()
@@ -46,7 +49,7 @@ def read_sample_names(sample_names_file):
             
             name, file = line.split("\t")
             if name in dict_all_sample_names:
-                print >>sys.stderr, "Duplicate sample name found: " + name
+                xprint("Duplicate sample name found: " + name)
                 sys.exit(2)
             
             dict_sample_name[file] = name
@@ -82,7 +85,7 @@ def derep_fasta(fasta_files, min_fasta):
         in_handle = happyfile.hopen_or_else(fasta_file)
         
         if verbose:
-            print >>sys.stderr, "Reading FASTA file: " + fasta_file
+            xprint("Reading FASTA file: " + fasta_file)
 
         id = ""
         seq = ""
@@ -104,7 +107,7 @@ def derep_fasta(fasta_files, min_fasta):
         
         # Remove counts for this file if below minimum
         if total_seqs < min_fasta:
-            print >>sys.stderr, "[fasta_dereplicate] Excluding: " + fasta_file
+            xprint("[fasta_dereplicate] Excluding: " + fasta_file)
             for key in dict_id_counts:
                 dict_id_counts[key] -= dict_id_file_counts.get((key, filenum), 0)
                 dict_id_file_counts[key, filenum] = 0
@@ -126,7 +129,7 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
         out_handle1 = happyfile.hopen_write_or_else(output_fasta_file)
 
     if verbose and output_fasta_file:
-        print >>sys.stderr, "Writing FASTA file: " + output_fasta_file
+        xprint("Writing FASTA file: " + output_fasta_file)
 
     if id_format == Format.bestid:
         for id in dict_id_map:
@@ -137,9 +140,9 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
     for key in dict_id_counts:
         if dict_id_num_samples.get(key, 0) >= min_samples and dict_id_counts[key] >= min_count and key in dict_id_seq:
             if id_format == Format.swarm:
-                print >>out_handle1, ">" + key + "_" + str(dict_id_counts[key]) + "\n" + dict_id_seq[key]
+                out_handle1.write(">" + key + "_" + str(dict_id_counts[key]) + "\n" + dict_id_seq[key] +"\n")
             elif id_format == Format.bestid and key in dict_bestid:
-                print >>out_handle1, ">" + dict_bestid[key] + "\n" + dict_id_seq[key]
+                out_handle1.write(">" + dict_bestid[key] + "\n" + dict_id_seq[key] + "\n")
 
     out_handle1.close()
 
@@ -147,7 +150,7 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
         out_handle2 = happyfile.hopen_write_or_else(output_counts_file)
 
         if verbose:
-            print >>sys.stderr, "Writing counts file: " + output_counts_file
+            xprint("Writing counts file: " + output_counts_file)
 
         column_names = ['id']
         for file in good_fasta_files:
@@ -156,7 +159,7 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
             else:
                 column_names.append(re.sub('\.filtered\.fa$', '', file))
 
-        print >>out_handle2, "\t".join(column_names)
+        out_handle2.write("\t".join(column_names) + "\n")
 
         for key in dict_id_counts:
             if dict_id_num_samples.get(key, 0) >= min_samples and dict_id_counts[key] >= min_count:
@@ -166,7 +169,7 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
                     id = re.split('\s', dict_bestid[key])[0]
                 for filenum in range(len(good_fasta_files)):
                     samplecounts.append(dict_id_file_counts.get((key, filenum), 0))
-                print >>out_handle2, id + "\t" + "\t".join(str(x) for x in samplecounts)
+                out_handle2.write(id + "\t" + "\t".join(str(x) for x in samplecounts) + "\n")
 
         out_handle2.close()
 
@@ -174,15 +177,15 @@ def write_dereps(output_fasta_file, output_counts_file, output_map_file, id_form
         out_handle3 = happyfile.hopen_write_or_else(output_map_file)
             
         if verbose:
-            print >>sys.stderr, "Writing map file: " + output_map_file
+            xprint("Writing map file: " + output_map_file)
 
         for id in sorted(dict_id_map, key=dict_id_map.get):
             key = dict_id_map[id]
             if dict_id_num_samples.get(key, 0) >= min_samples and dict_id_counts[key] >= min_count:
                 if id_format == Format.swarm:
-                    print >>out_handle3, key + "_" + str(dict_id_counts[key]) + "\t" + id
+                    out_handle3.write(key + "_" + str(dict_id_counts[key]) + "\t" + id + "\n")
                 elif id_format == Format.bestid:
-                    print >>out_handle3, re.split('\s', dict_bestid[key])[0] + "\t" + id
+                    out_handle3.write(re.split('\s', dict_bestid[key])[0] + "\t" + id + "\n")
 
         out_handle3.close()
 
@@ -193,9 +196,9 @@ def test_derep():
     derep_line("testid1", seq, 1)
     derep_line("testid2", seq, 2)
     if dict_id_counts.get(key,0) == 2 and dict_id_file_counts.get((key, 1),0) == 1 and dict_id_map.get("testid2","") == key and dict_id_seq.get(key, "") == seq:
-        print >>sys.stderr, "[fasta_dereplicate] test_derep: passed"
+        xprint("[fasta_dereplicate] test_derep: passed")
     else:
-        print >>sys.stderr, "[fasta_dereplicate] test_derep: failed"
+        xprint("[fasta_dereplicate] test_derep: failed")
         retval = False
     return retval
 
@@ -207,7 +210,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "fasta_dereplicate v0.4 (May 21, 2016)",
+        "fasta_dereplicate v0.5 (Nov. 21, 2017)",
         "Dereplicate FASTA",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options) [FASTA file(s)...]",
@@ -237,12 +240,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "o:c:m:n:t:l:sbhv", ["swarm", "bestid", "fasta_min", "help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -271,24 +274,24 @@ def main(argv):
     if len(args) > 0:
         fasta_files = args
     else:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     if verbose:
         if len(fasta_files) > 1:
-            print >>sys.stderr, "input fasta files:    " + fasta_files[0]
-            print >>sys.stderr, "\n".join("                      " + x for x in fasta_files[1:])
+            xprint("input fasta files:    " + fasta_files[0])
+            xprint("\n".join("                      " + x for x in fasta_files[1:]))
         else:
-            print >>sys.stderr, "input fasta file:     " + fasta_files[0]
+            xprint("input fasta file:     " + fasta_files[0])
 
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "output fasta file:    " + output_fasta_file,
             "output counts file:   " + output_counts_file,
             "output map file:      " + output_map_file,
             "output id format:     " + ("swarm", "bestid")[id_format-1],
             "minimum total counts: " + str(min_count),
             "minimum samples:      " + str(min_samples),
-            "minimum sequences:    " + str(min_fasta)])
+            "minimum sequences:    " + str(min_fasta)]))
 
     read_sample_names(sample_names_file)
     derep_fasta(fasta_files, min_fasta)

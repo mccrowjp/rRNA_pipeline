@@ -23,13 +23,16 @@ count_chimeras = 0
 count_low_quality = 0
 count_passed = 0
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def read_chimeras(chimera_file):
     global dict_chimera_ids
 
     in_handle = happyfile.hopen_or_else(chimera_file)
         
     if verbose:
-        print >>sys.stderr, "Reading chimera file: " + chimera_file
+        xprint("Reading chimera file: " + chimera_file)
 
     while 1:
         line = in_handle.readline()
@@ -77,20 +80,20 @@ def filter_line(out_handle, id, seq, qual, min_quality, min_seq_len, max_seq_len
 
     if not skipline:
         count_passed += 1
-        print >>out_handle, ">" + id + "\n" + seq
+        out_handle.write(">" + id + "\n" + seq + "\n")
 
 def filter_fastq(fastq_file, output_file, min_quality, min_seq_len, max_seq_len):
     in_handle = happyfile.hopen_or_else(fastq_file)
     
     if verbose:
-        print >>sys.stderr, "Reading FASTQ file: " + fastq_file
+        xprint("Reading FASTQ file: " + fastq_file)
 
     out_handle = sys.stdout
     if output_file:
         out_handle = happyfile.hopen_write_or_else(output_file)
 
     if verbose:
-        print >>sys.stderr, "Writing FASTA file: " + output_file
+        xprint("Writing FASTA file: " + output_file)
 
     rnum = 1
     id = ""
@@ -113,13 +116,13 @@ def filter_fastq(fastq_file, output_file, min_quality, min_seq_len, max_seq_len)
             rnum = 1
 
 def test_all():
-    print >>sys.stderr, "[fastq_filter] test_all: passed"
+    xprint("[fastq_filter] test_all: passed")
 
 ###
 
 def main(argv):
     help = "\n".join([
-        "fastq_filter v0.4 (May 21, 2016)",
+        "fastq_filter v0.5 (Nov. 21, 2017)",
         "Filter FASTQ file for length, quality, and chimeras (usearch)",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",
@@ -144,12 +147,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "f:o:c:q:m:x:hv", ["help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -172,23 +175,23 @@ def main(argv):
             unused_args.append(opt)
 
     if not fastq_file:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     if len(unused_args) > 0:
-        print >>sys.stderr, help
+        xprint(help)
         for arg in unused_args:
-            print >>sys.stderr, "Unused argument: " + str(arg)
+            xprint("Unused argument: " + str(arg))
         sys.exit(2)
 
     if verbose:
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "fastq file:   " + fastq_file,
             "chimera file: " + chimera_file,
             "output file:  " + output_file,
             "min quality:  " + str(min_quality),
             "min seq len:  " + str(min_seq_len),
-            "max seq len:  " + str(max_seq_len)])
+            "max seq len:  " + str(max_seq_len)]))
 
     if chimera_file:
         read_chimeras(chimera_file)
@@ -196,14 +199,14 @@ def main(argv):
     filter_fastq(fastq_file, output_file, min_quality, min_seq_len, max_seq_len)
 
     if verbose and count_total:
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "seqs total:       " + str(count_total),
             "seqs too short:   " + str(count_short_seqs) + " (" + str(round(100.0*count_short_seqs/count_total, 1)) + "%)",
             "seqs too long:    " + str(count_long_seqs) + " (" + str(round(100.0*count_long_seqs/count_total, 1)) + "%)",
             "seqs bad chars:   " + str(count_non_acgt) + " (" + str(round(100.0*count_non_acgt/count_total, 1)) + "%)",
             "seqs chimera:     " + str(count_chimeras) + " (" + str(round(100.0*count_chimeras/count_total, 1)) + "%)",
             "seqs low quality: " + str(count_low_quality) + " (" + str(round(100.0*count_low_quality/count_total, 1)) + "%)",
-            "seqs passed:      " + str(count_passed) + " (" + str(round(100.0*count_passed/count_total, 1)) + "%)"])
+            "seqs passed:      " + str(count_passed) + " (" + str(round(100.0*count_passed/count_total, 1)) + "%)"]))
 
 if __name__ == "__main__":
     main(sys.argv)

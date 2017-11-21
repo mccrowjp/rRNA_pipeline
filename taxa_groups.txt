@@ -2,6 +2,7 @@ Centric Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillari
 Centric Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Radial-centric
 Pennate Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Raphid-pennate
 Pennate Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta;Bacillariophyta_X;Araphid-pennate
+Other Diatom	Eukaryota;Stramenopiles;Stramenopiles_X;Bacillariophyta
 Other Stramenopiles	Eukaryota;Stramenopiles
 Rhizaria	Eukaryota;Rhizaria
 Excavata	Eukaryota;Excavata

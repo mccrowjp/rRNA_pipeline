@@ -25,6 +25,9 @@ dict_swarm_seq = {}
 dict_id_swarm = {}
 dict_swarm_num_samples = {}
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def read_sample_names(sample_names_file):
     global dict_sample_name
     
@@ -32,7 +35,7 @@ def read_sample_names(sample_names_file):
         in_handle = happyfile.hopen_or_else(sample_names_file)
     
         if verbose:
-            print >>sys.stderr, "Reading sample names file: " + sample_names_file
+            xprint("Reading sample names file: " + sample_names_file)
         
         while 1:
             line = in_handle.readline()
@@ -77,7 +80,7 @@ def read_counts(counts_file):
         in_handle = happyfile.hopen_or_else(counts_file)
         
         if verbose:
-            print >>sys.stderr, "Reading counts file: " + counts_file
+            xprint("Reading counts file: " + counts_file)
         
         firstline = 1
         while 1:
@@ -104,7 +107,7 @@ def get_swarms(fasta_file, swarm_file, cpus):
     global dict_id_swarm
     
     if fasta_file and not os.path.exists(swarm_file):
-        print >>sys.stderr, "[swarm_map] running swarm"
+        xprint("[swarm_map] running swarm")
 
         if cpus < 1:
             cpus = 1
@@ -112,13 +115,13 @@ def get_swarms(fasta_file, swarm_file, cpus):
         cmd = " ".join(["swarm -f -t", str(cpus), "-o", swarm_file, fasta_file])
         
         if verbose:
-            print >>sys.stderr, cmd
+            xprint(cmd)
         else:
             cmd += " &>/dev/null"
         
         rc = os.system(cmd)
         if rc != 0:
-            print >>sys.stderr, "[swarm_map] ERROR: swarm"
+            xprint("[swarm_map] ERROR: swarm")
             sys.exit(2)
 
     in_handle1 = happyfile.hopen_or_else(fasta_file)
@@ -136,7 +139,7 @@ def get_swarms(fasta_file, swarm_file, cpus):
 
     in_handle2 = happyfile.hopen_or_else(swarm_file)
     if verbose:
-        print >>sys.stderr, "Reading swarm file: " + swarm_file
+        xprint("Reading swarm file: " + swarm_file)
     
     while 1:
         line = in_handle2.readline()
@@ -154,7 +157,7 @@ def read_swarm_fasta(fasta_file):
     in_handle = happyfile.hopen_or_else(fasta_file)
     
     if verbose:
-        print >>sys.stderr, "Reading FASTA file: " + fasta_file
+        xprint("Reading FASTA file: " + fasta_file)
         
     id = ""
     seq = ""
@@ -187,11 +190,11 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
         out_handle1 = happyfile.hopen_write_or_else(output_fasta_file)
 
     if verbose and output_fasta_file:
-        print >>sys.stderr, "Writing FASTA file: " + output_fasta_file
+        xprint("Writing FASTA file: " + output_fasta_file)
 
     for swarm_id in dict_swarm_counts:
         if dict_swarm_num_samples[swarm_id] >= min_samples and dict_swarm_counts[swarm_id] >= min_count:
-            print >>out_handle1, ">" + swarm_id + "\n" + dict_swarm_seq[swarm_id]
+            out_handle1.write(">" + swarm_id + "\n" + dict_swarm_seq[swarm_id] + "\n")
 
     out_handle1.close()
 
@@ -199,7 +202,7 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
         out_handle2 = happyfile.hopen_write_or_else(output_counts_file)
 
         if verbose:
-            print >>sys.stderr, "Writing counts file: " + output_counts_file
+            xprint("Writing counts file: " + output_counts_file)
 
         column_names = ['id']
         for name in sample_list:
@@ -208,14 +211,14 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
             else:
                 column_names.append(name)
 
-        print >>out_handle2, "\t".join(column_names)
+        out_handle2.write("\t".join(column_names) + "\n")
 
         for swarm_id in dict_swarm_counts:
             if dict_swarm_num_samples[swarm_id] >= min_samples and dict_swarm_counts[swarm_id] >= min_count:
                 samplecounts = []
                 for i in range(len(sample_list)):
                     samplecounts.append(dict_swarm_sample_counts.get((swarm_id, i), 0))
-                print >>out_handle2, swarm_id + "\t" + "\t".join(str(x) for x in samplecounts)
+                out_handle2.write(swarm_id + "\t" + "\t".join(str(x) for x in samplecounts) + "\n")
 
         out_handle2.close()
 
@@ -223,23 +226,23 @@ def write_swarms(output_fasta_file, output_counts_file, output_map_file, min_sam
         out_handle3 = happyfile.hopen_write_or_else(output_map_file)
             
         if verbose:
-            print >>sys.stderr, "Writing map file: " + output_map_file
+            xprint("Writing map file: " + output_map_file)
 
         for id in sorted(dict_id_swarm, key=dict_id_swarm.get):
             swarm_id = dict_id_swarm[id]
             if dict_swarm_num_samples[swarm_id] >= min_samples and dict_swarm_counts[swarm_id] >= min_count:
-                print >>out_handle3, swarm_id + "\t" + id
+                out_handle3.write(swarm_id + "\t" + id + "\n")
 
         out_handle3.close()
 
 def test_all():
-    print >>sys.stderr, "[swarm_map] test_all: passed"
+    xprint("[swarm_map] test_all: passed")
 
 ###
 
 def main(argv):
     help = "\n".join([
-        "swarm_map v0.4 (May 21, 2016)",
+        "swarm_map v0.5 (Nov. 21, 2017)",
         "swarm OTU FASTA, sample counts, and id mapping",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",
@@ -271,12 +274,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "f:s:d:o:c:m:n:t:l:x:hv", ["cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -305,22 +308,22 @@ def main(argv):
             verbose = True
 
     if not (fasta_file and swarm_file):
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     if (output_counts_file or min_samples > 1) and not counts_file:
-        print >>sys.stderr, help + "\nDereplicated counts table required (-d)"
+        xprint(help + "\nDereplicated counts table required (-d)")
         sys.exit(2)
 
     if verbose:
-        print >>sys.stderr, "input fasta file:     " + fasta_file
+        xprint("input fasta file:     " + fasta_file)
 
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "output fasta file:    " + output_fasta_file,
             "output counts file:   " + output_counts_file,
             "output map file:      " + output_map_file,
             "minimum total counts: " + str(min_count),
-            "minimum samples:      " + str(min_samples)])
+            "minimum samples:      " + str(min_samples)]))
 
     read_sample_names(sample_names_file)
     get_swarms(fasta_file, swarm_file, cpus)

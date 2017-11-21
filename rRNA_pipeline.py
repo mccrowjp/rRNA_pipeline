@@ -26,6 +26,9 @@ verbose = False
 overwrite = False
 do_chimera_search = True
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def xstr(s):
     if s is None:
         return ''
@@ -100,7 +103,7 @@ def is_fasta(fasta_file):
 
 def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
     if overwrite or not os.path.exists(checkfile):
-        print >>sys.stderr, "[rRNA_pipeline] running " + name + " " + checkfile
+        xprint("[rRNA_pipeline] running " + name + " " + checkfile)
 
         cmd = cmd_exe + " "
         if verbose and not redirect_all:
@@ -110,14 +113,14 @@ def run_command(name, checkfile, cmd_exe, cmd_params, redirect_all):
             cmd += " &>/dev/null"
 
         if verbose:
-            print >>sys.stderr, cmd
+            xprint(cmd)
 
         rc = os.system(cmd)
         if rc != 0:
-            print >>sys.stderr, "[rRNA_pipeline] ERROR: " + name
+            xprint("[rRNA_pipeline] ERROR: " + name)
             sys.exit(2)
     else:
-        print >>sys.stderr, "[rRNA_pipeline] skipping " + name + " " + checkfile
+        xprint("[rRNA_pipeline] skipping " + name + " " + checkfile)
 
 def run_merge_fastq(fp):
     if fp.ispaired:
@@ -199,7 +202,7 @@ def remove_plastid_seqs(output_base_file):
 
     if overwrite or not os.path.exists(swarm_plastid_fa):
         if verbose:
-            print >>sys.stderr, "Filtering chloroplast sequences"
+            xprint("Filtering chloroplast sequences")
 
         # split 16S/Plastid swarm taxonomy table
         in_handle_tax = happyfile.hopen_or_else(swarm_tax)
@@ -214,13 +217,13 @@ def remove_plastid_seqs(output_base_file):
             cols = line.split('\t')
 
             if firstline:
-                print >>out_handle_16S_tax, line
+                out_handle_16S_tax.write(line + "\n")
             else:
                 m = re.match('Bacteria;Cyanobacteria;Chloroplast', cols[2])
                 if m:
                     dict_plastid[cols[0]] = 1
                 else:
-                    print >>out_handle_16S_tax, line
+                    out_handle_16S_tax.write(line + "\n")
 
             firstline = 0
 
@@ -241,11 +244,11 @@ def remove_plastid_seqs(output_base_file):
             swarm_id = id_list[0]
             
             if swarm_id in dict_plastid:
-                print >>out_handle_plastid_table, line
+                out_handle_plastid_table.write(line + "\n")
                 for id in id_list:
                     dict_plastid[id] = 1
             else:
-                print >>out_handle_16S_table, line
+                out_handle_16S_table.write(line + "\n")
 
         in_handle_table.close()
         out_handle_16S_table.close()
@@ -268,9 +271,9 @@ def remove_plastid_seqs(output_base_file):
             
             if id:
                 if id in dict_plastid:
-                    print >>out_handle_plastid_derep_fa, line
+                    out_handle_plastid_derep_fa.write(line + "\n")
                 else:
-                    print >>out_handle_16S_derep_fa, line
+                    out_handle_16S_derep_fa.write(line + "\n")
 
         in_handle_derep_fa.close()
         out_handle_16S_derep_fa.close()
@@ -290,13 +293,13 @@ def remove_plastid_seqs(output_base_file):
             cols = line.split('\t')
             
             if firstline:
-                print >>out_handle_16S_derep_counts, line
-                print >>out_handle_plastid_derep_counts, line
+                out_handle_16S_derep_counts.write(line + "\n")
+                out_handle_plastid_derep_counts.write(line + "\n")
             else:
                 if cols[0] in dict_plastid:
-                    print >>out_handle_plastid_derep_counts, line
+                    out_handle_plastid_derep_counts.write(line + "\n")
                 else:
-                    print >>out_handle_16S_derep_counts, line
+                    out_handle_16S_derep_counts.write(line + "\n")
 
             firstline = 0
 
@@ -321,9 +324,9 @@ def remove_plastid_seqs(output_base_file):
 
             if id:
                 if id in dict_plastid:
-                    print >>out_handle_plastid_fa, line
+                    out_handle_plastid_fa.write(line + "\n")
                 else:
-                    print >>out_handle_16S_fa, line
+                    out_handle_16S_fa.write(line + "\n")
 
         in_handle_fa.close()
         out_handle_16S_fa.close()
@@ -343,13 +346,13 @@ def remove_plastid_seqs(output_base_file):
             cols = line.split('\t')
 
             if firstline:
-                print >>out_handle_16S_counts, line
-                print >>out_handle_plastid_counts, line
+                out_handle_16S_counts.write(line + "\n")
+                out_handle_plastid_counts.write(line + "\n")
             else:
                 if cols[0] in dict_plastid:
-                    print >>out_handle_plastid_counts, line
+                    out_handle_plastid_counts.write(line + "\n")
                 else:
-                    print >>out_handle_16S_counts, line
+                    out_handle_16S_counts.write(line + "\n")
 
             firstline = 0
         
@@ -366,7 +369,7 @@ def remove_plastid_seqs(output_base_file):
             replace_file(tmp_swarm_16S_fa, swarm_fa)
             replace_file(tmp_swarm_16S_counts, swarm_counts)
         else:
-            print >>sys.stderr, "Not all tmp_ files found"
+            xprint("Not all tmp_ files found")
             sys.exit(2)
 
 def run_classify_chloro(output_base_file, database_file):
@@ -478,9 +481,9 @@ def test_each_dependency(cmd, name):
         rc = 1
     if rc:
         failed = 1
-        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: " + name + " failed"
+        xprint("[rRNA_pipeline] test_dependencies: " + name + " failed")
     else:
-        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: " + name + " passed"
+        xprint("[rRNA_pipeline] test_dependencies: " + name + " passed")
     return failed
 
 def test_dependencies():
@@ -490,9 +493,9 @@ def test_dependencies():
     failed += test_each_dependency("swarm", "SWARM")
     failed += test_each_dependency("glsearch36", "FASTA36")
     if failed:
-        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: " + str(failed) + " test(s) failed"
+        xprint("[rRNA_pipeline] test_dependencies: " + str(failed) + " test(s) failed")
     else:
-        print >>sys.stderr, "[rRNA_pipeline] test_dependencies: All tests passed"
+        xprint("[rRNA_pipeline] test_dependencies: All tests passed")
     return failed
 
 def test_databases():
@@ -503,14 +506,14 @@ def test_databases():
         failed = 1
     for db in ('16S', '18S', 'V4', 'V9', 'chloro'):
         if os.path.exists(dict_database_path.get(db, "")):
-            print >>sys.stderr, "[rRNA_pipeline] test_databases: " + db + " found"
+            xprint("[rRNA_pipeline] test_databases: " + db + " found")
         else:
-            print >>sys.stderr, "[rRNA_pipeline] test_databases: " + db + " database not found"
+            xprint("[rRNA_pipeline] test_databases: " + db + " database not found")
             failed += 1
     if failed:
-        print >>sys.stderr, "[rRNA_pipeline] test_databases: " + str(failed) + " test(s) failed"
+        xprint("[rRNA_pipeline] test_databases: " + str(failed) + " test(s) failed")
     else:
-        print >>sys.stderr, "[rRNA_pipeline] test_databases: All tests passed"
+        xprint("[rRNA_pipeline] test_databases: All tests passed")
     return failed
 
 def test_each_script(script):
@@ -533,9 +536,9 @@ def test_scripts():
     failed += test_each_script("purity_plot.py")
     failed += test_each_script("group_taxa.py")
     if failed:
-        print >>sys.stderr, "[rRNA_pipeline] test_scripts: " + str(failed) + " test(s) failed"
+        xprint("[rRNA_pipeline] test_scripts: " + str(failed) + " test(s) failed")
     else:
-        print >>sys.stderr, "[rRNA_pipeline] test_scripts: All tests passed"
+        xprint("[rRNA_pipeline] test_scripts: All tests passed")
     return failed
 
 def test_all():
@@ -544,16 +547,16 @@ def test_all():
     failed += test_databases()
     failed += test_scripts()
     if failed:
-        print >>sys.stderr, "[rRNA_pipeline] test_all: " + str(failed) + " test(s) failed"
+        xprint("[rRNA_pipeline] test_all: " + str(failed) + " test(s) failed")
         sys.exit(2)
     else:
-        print >>sys.stderr, "[rRNA_pipeline] test_all: All tests passed"
+        xprint("[rRNA_pipeline] test_all: All tests passed")
 
 ###
 
 def main(argv):
     help = "\n".join([
-        "rRNA_pipeline v0.4 (May 21, 2016)",
+        "rRNA_pipeline v0.5 (Nov. 21, 2017)",
         "Full ssu-rRNA, swarm OTU classification pipeline",
         "",
         "Usage: " + os.path.basename(prog_path) + " (options)",
@@ -597,12 +600,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "d:q:o:n:pm:s:t:Wwhv", ["steps", "overwrite", "cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -635,7 +638,7 @@ def main(argv):
             verbose = True
 
     if not (database_name):
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     output_base_file = output_base_file.rstrip('.')
@@ -649,7 +652,7 @@ def main(argv):
 
     derep_counts = output_base_file + ".derep.counts"
     if not fastq_dir and not os.path.exists(derep_counts):
-        print >>sys.stderr, help + "\nFASTQ folder -f required if not found: " + derep_counts
+        xprint(help + "\nFASTQ folder -f required if not found: " + derep_counts)
         sys.exit(2)
 
     init()
@@ -657,11 +660,11 @@ def main(argv):
     if database_name in ('16S', '18S', 'V4', 'V9'):
         database_file = dict_database_path[database_name]
     else:
-        print >>sys.stderr, help + "\nDatabase name must be one of: 16S, 18S, V4, V9"
+        xprint(help + "\nDatabase name must be one of: 16S, 18S, V4, V9")
         sys.exit(2)
 
     if verbose:
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "input fastq dir:    " + fastq_dir,
             "input sample names: " + sample_names_file,
             "database name:      " + database_name,
@@ -670,7 +673,7 @@ def main(argv):
             "overwrite files:    " + ("no", "yes")[overwrite],
             "chimera search:     " + ("no", "yes")[do_chimera_search],
             "min fastq quality:  " + str(min_quality_score),
-            "cpus:               " + str(cpus)])
+            "cpus:               " + str(cpus)]))
 
     if cpus < 1:
         cpus = 1
@@ -678,9 +681,9 @@ def main(argv):
     if fastq_dir:
         get_seq_file_pairs(fastq_dir)
 
-        print >>sys.stderr, "Found " + str(len(list_seq_file_pairs)) + " samples"
+        xprint("Found " + str(len(list_seq_file_pairs)) + " samples")
         for fp in sorted(list_seq_file_pairs, key=lambda fp: fp.basefile):
-            print >>sys.stderr, fp.basefile + " " + ("", " [paired]")[fp.ispaired]
+            xprint(fp.basefile + " " + ("", " [paired]")[fp.ispaired])
 
         for fp in sorted(list_seq_file_pairs, key=lambda fp: fp.basefile):
             if run_all_steps or 'merge_fastq' in dict_steps:
@@ -690,7 +693,7 @@ def main(argv):
             if run_all_steps or 'filter_fasta' in dict_steps:
                 run_filter(fp, min_quality_score)
     else:
-        print >>sys.stderr, "[rRNA_pipeline] skipping FASTQ merge/chimera/filtering"
+        xprint("[rRNA_pipeline] skipping FASTQ merge/chimera/filtering")
     
     if run_all_steps or 'derep' in dict_steps:
         run_dereplicate(output_base_file, sample_names_file)

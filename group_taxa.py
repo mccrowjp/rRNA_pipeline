@@ -22,13 +22,16 @@ dict_taxa_sample_counts = {}
 dict_group_counts = {}
 dict_group_sample_counts = {}
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def read_groups(taxa_group_file):
     global dict_taxonomy_group
     
     in_handle = happyfile.hopen_or_else(taxa_group_file)
 
     if verbose:
-        print >>sys.stderr, "Reading taxa groups file: " + taxa_group_file
+        xprint("Reading taxa groups file: " + taxa_group_file)
     
     while 1:
         line = in_handle.readline()
@@ -53,7 +56,7 @@ def read_taxa_counts(swarm_tax_file):
     in_handle = happyfile.hopen_or_else(swarm_tax_file)
     
     if verbose:
-        print >>sys.stderr, "Reading taxa counts file: " + swarm_tax_file
+        xprint("Reading taxa counts file: " + swarm_tax_file)
     
     firstline = 1
     while 1:
@@ -95,31 +98,31 @@ def write_group_counts(output_groups_file):
         out_handle = happyfile.hopen_write_or_else(output_groups_file)
 
     if verbose and output_groups_file:
-        print >>sys.stderr, "Writing group counts file: " + output_groups_file
+        xprint("Writing group counts file: " + output_groups_file)
 
     column_names = ['group']
     for name in sample_list:
         column_names.append(name)
 
-    print >>out_handle, "\t".join(column_names)
+    out_handle.write("\t".join(column_names) + "\n")
 
     for group_name in sorted(dict_group_counts, key=lambda x: dict_group_counts.get(x), reverse=True):
         samplecounts = [group_name]
         for i in range(len(sample_list)):
             samplecounts.append(dict_group_sample_counts.get((group_name, i), 0))
-        print >>out_handle, "\t".join(str(x) for x in samplecounts)
+        out_handle.write("\t".join(str(x) for x in samplecounts) + "\n")
 
     if output_groups_file:
         out_handle.close()
 
 def test_all():
-    print >>sys.stderr, "[group_taxa] test_all: passed"
+    xprint("[group_taxa] test_all: passed")
 
 ###
 
 def main(argv):
     help = "\n".join([
-        "group_taxa v0.4 (May 21, 2016)",
+        "group_taxa v0.5 (Nov. 21, 2017)",
         "merge OTU counts by taxonomic groups",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",
@@ -137,12 +140,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "f:g:o:hv", ["help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -157,14 +160,14 @@ def main(argv):
             verbose = True
 
     if not (swarm_tax_file and taxa_group_file):
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     if verbose:
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "input taxa groups file: " + taxa_group_file,
             "input taxa counts file: " + swarm_tax_file,
-            "output groups file:     " + output_groups_file])
+            "output groups file:     " + output_groups_file]))
 
     read_groups(taxa_group_file)
     read_taxa_counts(swarm_tax_file)

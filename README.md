@@ -131,16 +131,10 @@ If you are having trouble with usearch or want to skip the chimera checking for 
 chimera: off
 ```
 
-**Python 3**
-If you have Python 3 installed, use the files in source_py3 instead. These can be copied by:
-```bash
-make python3
-```
-
 Dependencies
 ------------
 
-* Python 2.7 (https://www.python.org/downloads/)
+* Python 2 or 3 (https://www.python.org/downloads/)
 * R (https://cran.r-project.org/)
 * PEAR (https://github.com/xflouris/PEAR.git)
 * USEARCH v8.0 (http://www.drive5.com/usearch/download.html)

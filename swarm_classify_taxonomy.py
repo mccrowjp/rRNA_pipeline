@@ -23,6 +23,9 @@ dict_id_taxonomy = {}
 dict_swarm_sample_counts = {}
 dict_swarm_counts = {}
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def read_sample_names(sample_names_file):
     global dict_sample_name
     
@@ -30,7 +33,7 @@ def read_sample_names(sample_names_file):
         in_handle = happyfile.hopen_or_else(sample_names_file)
     
         if verbose:
-            print >>sys.stderr, "Reading sample names file: " + sample_names_file
+            xprint("Reading sample names file: " + sample_names_file)
         
         while 1:
             line = in_handle.readline()
@@ -58,7 +61,7 @@ def read_counts(counts_file):
         in_handle = happyfile.hopen_or_else(counts_file)
         
         if verbose:
-            print >>sys.stderr, "Reading counts file: " + counts_file
+            xprint("Reading counts file: " + counts_file)
         
         firstline = 1
         while 1:
@@ -87,9 +90,9 @@ def get_taxonomy(fasta_file, ggsearch_file, database_file, cpus):
     if fasta_file:
         if os.path.exists(ggsearch_file):
             if verbose:
-                print >>sys.stderr, "Ignoring FASTA file: " + fasta_file
+                xprint("Ignoring FASTA file: " + fasta_file)
         else:
-            print >>sys.stderr, "[swarm_classify_taxonomy] running ggsearch"
+            xprint("[swarm_classify_taxonomy] running ggsearch")
             
             if cpus < 1:
                 cpus = 1
@@ -97,16 +100,16 @@ def get_taxonomy(fasta_file, ggsearch_file, database_file, cpus):
             cmd = " ".join(["glsearch36 -b 1 -m 8 -T", str(cpus), fasta_file, database_file, ">", ggsearch_file])
             
             if verbose:
-                print >>sys.stderr, cmd
+                xprint(cmd)
             
             rc = os.system(cmd)
             if rc != 0:
-                print >>sys.stderr, "[swarm_classify_taxonomy] ERROR: ggsearch"
+                xprint("[swarm_classify_taxonomy] ERROR: ggsearch")
                 sys.exit(2)
 
     in_handle1 = happyfile.hopen_or_else(ggsearch_file)
     if verbose:
-        print >>sys.stderr, "Reading ggsearch file: " + ggsearch_file
+        xprint("Reading ggsearch file: " + ggsearch_file)
     
     while 1:
         line = in_handle1.readline()
@@ -122,7 +125,7 @@ def get_taxonomy(fasta_file, ggsearch_file, database_file, cpus):
 
     in_handle2 = happyfile.hopen_or_else(database_file)
     if verbose:
-        print >>sys.stderr, "Reading database file: " + database_file
+        xprint("Reading database file: " + database_file)
         
     while 1:
         line = in_handle2.readline()
@@ -146,7 +149,7 @@ def write_swarms(output_counts_file):
         out_handle = happyfile.hopen_write_or_else(output_counts_file)
 
     if verbose and output_counts_file:
-        print >>sys.stderr, "Writing counts file: " + output_counts_file
+        xprint("Writing counts file: " + output_counts_file)
 
     column_names = ['id', 'besthit', 'taxonomy']
     for name in sample_list:
@@ -155,7 +158,7 @@ def write_swarms(output_counts_file):
         else:
             column_names.append(name)
 
-    print >>out_handle, "\t".join(column_names)
+    out_handle.write("\t".join(column_names) + "\n")
 
     for swarm_id in dict_swarm_counts:
         besthit = dict_swarm_best_hit.get(swarm_id, "")
@@ -165,19 +168,19 @@ def write_swarms(output_counts_file):
         samplecounts = [swarm_id, besthit, tax]
         for i in range(len(sample_list)):
             samplecounts.append(dict_swarm_sample_counts.get((swarm_id, i), 0))
-        print >>out_handle, "\t".join(str(x) for x in samplecounts)
+        out_handle.write("\t".join(str(x) for x in samplecounts) + "\n")
 
     if output_counts_file:
         out_handle.close()
 
 def test_all():
-    print >>sys.stderr, "[swarm_classify_taxonomy] test_all: passed"
+    xprint("[swarm_classify_taxonomy] test_all: passed")
 
 ###
 
 def main(argv):
     help = "\n".join([
-        "swarm_classify_taxonomy v0.4 (May 21, 2016)",
+        "swarm_classify_taxonomy v0.5 (Nov. 21, 2017)",
         "swarm OTU add taxonomy to counts table",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",
@@ -203,12 +206,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "f:g:d:c:o:n:t:hv", ["cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -231,18 +234,18 @@ def main(argv):
             verbose = True
 
     if not (ggsearch_file and database_file and counts_file):
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     if verbose:
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "input fasta file:     " + fasta_file,
             "input ggsearch file:  " + ggsearch_file,
             "input counts file:    " + counts_file,
             "input database file:  " + database_file,
             "input sample names:   " + sample_names_file,
             "output counts file:   " + output_counts_file,
-            "cpus:                 " + str(cpus)])
+            "cpus:                 " + str(cpus)]))
 
     read_sample_names(sample_names_file)
     get_taxonomy(fasta_file, ggsearch_file, database_file, cpus)

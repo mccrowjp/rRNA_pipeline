@@ -26,10 +26,13 @@ dict_id_best_hit = {}
 dict_id_best_bs = {}
 dict_id_taxonomy = {}
 
+def xprint(s):
+	sys.stderr.write(str(s) + '\n')
+
 def read_swarms(swarm_file):
     in_handle = happyfile.hopen_or_else(swarm_file)
     if verbose:
-        print >>sys.stderr, "Reading swarm file: " + swarm_file
+        xprint("Reading swarm file: " + swarm_file)
     
     while 1:
         line = in_handle.readline()
@@ -49,7 +52,7 @@ def read_swarm_counts(swarm_counts_file, min_swarm_count, top_swarms):
     in_handle = happyfile.hopen_or_else(swarm_counts_file)
     
     if verbose:
-        print >>sys.stderr, "Reading swarm counts file: " + swarm_counts_file
+        xprint("Reading swarm counts file: " + swarm_counts_file)
         
     firstline = 1
     while 1:
@@ -80,19 +83,19 @@ def read_swarm_counts(swarm_counts_file, min_swarm_count, top_swarms):
             dict_derep_ids[id] = 1
 
     if verbose:
-        print >>sys.stderr, "Top purity content, swarms: " + str(len(dict_top_swarms)) + " derep ids: " + str(len(dict_derep_ids))
+        xprint("Top purity content, swarms: " + str(len(dict_top_swarms)) + " derep ids: " + str(len(dict_derep_ids)))
 
 def write_swarm_content(fasta_file, swarm_content_fasta_file):
     swarm_content_size = 0
     in_handle = happyfile.hopen_or_else(fasta_file)
         
     if verbose:
-        print >>sys.stderr, "Reading FASTA file: " + fasta_file
+        xprint("Reading FASTA file: " + fasta_file)
         
     out_handle = happyfile.hopen_write_or_else(swarm_content_fasta_file)
 
     if verbose:
-        print >>sys.stderr, "Writing swarm content FASTA file: " + swarm_content_fasta_file
+        xprint("Writing swarm content FASTA file: " + swarm_content_fasta_file)
         
     write_out = False
     while 1:
@@ -110,7 +113,7 @@ def write_swarm_content(fasta_file, swarm_content_fasta_file):
                 write_out = False
 
         if write_out:
-            print >>out_handle, line
+            out_handle.write(line + "\n")
     
     in_handle.close()
     out_handle.close()
@@ -125,9 +128,9 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
     if swarm_content_fasta_file:
         if os.path.exists(swarm_content_ggsearch_file):
             if verbose:
-                print >>sys.stderr, "Ignoring content FASTA file: " + swarm_content_fasta_file
+                xprint("Ignoring content FASTA file: " + swarm_content_fasta_file)
         else:
-            print >>sys.stderr, "[purity_plot] running ggsearch"
+            xprint("[purity_plot] running ggsearch")
             
             if cpus < 1:
                 cpus = 1
@@ -135,18 +138,18 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
             cmd = " ".join(["glsearch36 -b 1 -m 8 -T", str(cpus), swarm_content_fasta_file, database_file, ">", swarm_content_ggsearch_file])
             
             if verbose:
-                print >>sys.stderr, cmd
+                xprint(cmd)
             else:
                 cmd += " 2>/dev/null"
             
             rc = os.system(cmd)
             if rc != 0:
-                print >>sys.stderr, "[purity_plot] ERROR: ggsearch"
+                xprint("[purity_plot] ERROR: ggsearch")
                 sys.exit(2)
 
     in_handle1 = happyfile.hopen_or_else(swarm_content_ggsearch_file)
     if verbose:
-        print >>sys.stderr, "Reading ggsearch file: " + swarm_content_ggsearch_file
+        xprint("Reading ggsearch file: " + swarm_content_ggsearch_file)
     
     while 1:
         line = in_handle1.readline()
@@ -162,7 +165,7 @@ def get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database
 
     in_handle2 = happyfile.hopen_or_else(database_file)
     if verbose:
-        print >>sys.stderr, "Reading database file: " + database_file
+        xprint("Reading database file: " + database_file)
         
     while 1:
         line = in_handle2.readline()
@@ -184,9 +187,9 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
     if output_swarm_content_tax_file:
         out_handle1 = happyfile.hopen_write_or_else(output_swarm_content_tax_file)
         if verbose:
-            print >>sys.stderr, "Writing swarm content taxonomy file: " + output_swarm_content_tax_file
+            xprint("Writing swarm content taxonomy file: " + output_swarm_content_tax_file)
         
-        print >>out_handle1, "\t".join(['id', 'swarm', 'besthit', 'taxonomy'])
+        out_handle1.write("\t".join(['id', 'swarm', 'besthit', 'taxonomy']) + "\n")
 
         for id in dict_derep_ids:
             swarm_id = dict_id_swarm.get(id, "")
@@ -195,14 +198,14 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
             if besthit:
                 tax = dict_id_taxonomy.get(besthit, "")
 
-            print >>out_handle1, "\t".join([id, swarm_id, besthit, tax])
+            out_handle1.write("\t".join([id, swarm_id, besthit, tax]) + "\n")
 
         out_handle1.close()
 
     out_handle2 = happyfile.hopen_write_or_else(output_swarm_purity_file)
 
     if verbose:
-        print >>sys.stderr, "Writing swarm purity file: " + output_swarm_purity_file
+        xprint("Writing swarm purity file: " + output_swarm_purity_file)
 
     count_all = {}
     count_same_tax = {}
@@ -227,27 +230,27 @@ def write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output
                     if id_tax and id_tax == swarm_tax:
                         count_same_tax[swarm_id] = count_same_tax.get(swarm_id, 0) + derep_size
 
-    print >>out_handle2, "\t".join(['swarm_id', 'taxonomy', 'size', 'same_taxon', 'purity'])
+    out_handle2.write("\t".join(['swarm_id', 'taxonomy', 'size', 'same_taxon', 'purity']) + "\n")
 
     count_pure_OTUs = 0
     for swarm_id in count_all:
-        print >>out_handle2, "\t".join([swarm_id, dict_id_taxonomy.get(swarm_id, ""), str(count_all[swarm_id]), str(count_same_tax.get(swarm_id, 0)), str(1.0 * count_same_tax.get(swarm_id, 0) / count_all[swarm_id])])
+        out_handle2.write("\t".join([swarm_id, dict_id_taxonomy.get(swarm_id, ""), str(count_all[swarm_id]), str(count_same_tax.get(swarm_id, 0)), str(1.0 * count_same_tax.get(swarm_id, 0) / count_all[swarm_id])]) + "\n")
         if count_same_tax.get(swarm_id, 0) == count_all[swarm_id]:
             count_pure_OTUs += 1
 
     out_handle2.close()
 
     if len(count_all):
-        print >>sys.stderr, "OTUs 100% purity: " + str(count_pure_OTUs) + " / " + str(len(count_all)) + " (" + str(round(100.0 * count_pure_OTUs / len(count_all), 1)) + "%)"
+        xprint("OTUs 100% purity: " + str(count_pure_OTUs) + " / " + str(len(count_all)) + " (" + str(round(100.0 * count_pure_OTUs / len(count_all), 1)) + "%)")
 
     cmd = " ".join([R_script, output_swarm_purity_file, output_purity_pdf])
 
     if verbose:
-        print >>sys.stderr, cmd
+        xprint(cmd)
         
     rc = os.system(cmd + " >/dev/null")
     if rc != 0:
-        print >>sys.stderr, "[purity_plot] ERROR: " + R_script
+        xprint("[purity_plot] ERROR: " + R_script)
         sys.exit(2)
 
 def test_progs():
@@ -263,9 +266,9 @@ def test_progs():
         passed = False
 
     if passed:
-        print >>sys.stderr, "[purity_plot] test_progs: passed"
+        xprint("[purity_plot] test_progs: passed")
     else:
-        print >>sys.stderr, "[purity_plot] test_progs: failed"
+        xprint("[purity_plot] test_progs: failed")
     return passed
 
 def test_all():
@@ -276,7 +279,7 @@ def test_all():
 
 def main(argv):
     help = "\n".join([
-        "purity_plot v0.4 (May 21, 2016)",
+        "purity_plot v0.5 (Nov. 21, 2017)",
         "swarm OTU purity calculate and plot PDF",
         "",
         "Usage: " + os.path.basename(argv[0]) + " (options)",
@@ -309,12 +312,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv[1:], "f:s:c:d:m:n:o:t:hv", ["cpus=", "help", "verbose", "test"])
     except getopt.GetoptError:
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print >>sys.stderr, help
+            xprint(help)
             sys.exit()
         elif opt == '--test':
             test_all()
@@ -339,7 +342,7 @@ def main(argv):
             verbose = True
 
     if not (fasta_file and swarm_file and swarm_counts_file and base_file and database_file):
-        print >>sys.stderr, help
+        xprint(help)
         sys.exit(2)
 
     swarm_content_ggsearch_file = base_file + ".content.ggsearch"
@@ -349,7 +352,7 @@ def main(argv):
     output_purity_pdf = base_file + ".purity.pdf"
 
     if verbose:
-        print >>sys.stderr, "\n".join([
+        xprint("\n".join([
             "input fasta file:           " + fasta_file,
             "input swarm file:           " + swarm_file,
             "input database file:        " + database_file,
@@ -360,7 +363,7 @@ def main(argv):
             "content taxonomy file:      " + output_swarm_content_tax_file,
             "output swarm content table: " + output_swarm_purity_file,
             "output purity pdf:          " + output_purity_pdf,
-            "cpus:                       " + str(cpus)])
+            "cpus:                       " + str(cpus)]))
 
     read_swarms(swarm_file)
     read_swarm_counts(swarm_counts_file, min_swarm_count, top_swarms)
@@ -368,7 +371,7 @@ def main(argv):
         get_taxonomy(swarm_content_fasta_file, swarm_content_ggsearch_file, database_file, cpus)
         write_purity(output_swarm_content_tax_file, output_swarm_purity_file, output_purity_pdf)
     else:
-        print >>sys.stderr, "[purity_plot] skipping purity: no content above threshold"
+        xprint("[purity_plot] skipping purity: no content above threshold")
 
 if __name__ == "__main__":
     main(sys.argv)
