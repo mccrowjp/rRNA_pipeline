@@ -25,6 +25,7 @@ if($sampfile) {
     while(<IN>) {
 	chomp;
 	my ($new, $old) = split(/\t/);
+	$old =~ s/_.+//g;
 	$sampname{$old} = $new;
 	$samplib{$new} = $old;
     }
