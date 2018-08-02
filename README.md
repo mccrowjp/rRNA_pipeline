@@ -23,6 +23,7 @@ Usage
 | plot_taxa_groups.r | produce taxonomic groups plot |
 | plot_diversity.r | produce sample diversity plot |
 | plot_heatmap.r | produce sample/OTU heatmap |
+| get_rRNA_stats.pl | produce sequencing stats table |
 
 ```
 rRNA_pipeline v0.4 (May 21, 2016)
